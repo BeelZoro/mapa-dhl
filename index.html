@@ -6,34 +6,49 @@
 <title>Mapa DHL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ✅ Leaflet -->
+<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-<!-- ✅ Geocoder -->
+<!-- Geocoder -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
 
 <style>
-html, body { height: 100%; margin: 0; }
+html, body {
+  height: 100%;
+  margin: 0;
+}
 
+/* ✅ TOPO (sempre acima de tudo) */
 #topbar {
   position: fixed;
   top: 0;
   width: 100%;
+  height: 60px;
   background: #ffcc00;
   text-align: center;
-  padding: 8px;
-  z-index: 1000;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#topbar img { width: 120px; }
+#topbar img {
+  height: 40px;
+}
 
+/* ✅ MAPA */
 #map {
   width: 100%;
   height: calc(100% - 60px);
   margin-top: 60px;
 }
 
-/* ✅ Dashboard */
+/* ✅ AJUSTE BUSCA (para não sobrepor logo) */
+.leaflet-control-geocoder {
+  margin-top: 70px !important;
+}
+
+/* ✅ DASHBOARD */
 #dashboard {
   position: fixed;
   left: 10px;
@@ -42,43 +57,28 @@ html, body { height: 100%; margin: 0; }
   padding: 15px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  z-index: 1001;
+  z-index: 1500;
   font-family: Arial;
 }
 
-/* ✅ Botões */
-#controleTotal {
-  position: fixed;
-  left: 10px;
-  top: 260px;
-  z-index: 1001;
+/* ✅ CHECKBOX GLOBAL */
+#controleGlobal {
+  margin-top: 10px;
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
 }
 
-#controleTotal button {
-  display: block;
-  margin: 5px 0;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 6px;
-  background: #ffcc00;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-/* ✅ Animação clique */
-.leaflet-marker-icon {
-  transition: transform 0.2s ease;
-}
-
+/* ✅ animação clique */
 .leaflet-marker-icon:active {
   transform: scale(1.3);
+  transition: 0.2s;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ✅ LOGO -->
+<!-- ✅ TOPO -->
 <div id="topbar">
   <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg">
 </div>
@@ -86,24 +86,26 @@ html, body { height: 100%; margin: 0; }
 <!-- ✅ DASHBOARD -->
 <div id="dashboard">
   <h3>📊 Resumo</h3>
+
   <p>🔵 Shoppings: <span id="qtdAzul">0</span></p>
   <p>🔴 SPG: <span id="qtdVermelho">0</span></p>
-  <p>🟢 Lojas de Rua Premier: <span id="qtdVerde">0</span></p>
+  <p>🟢 Lojas: <span id="qtdVerde">0</span></p>
   <p>🟡 Honda: <span id="qtdAmarelo">0</span></p>
   <p>🟠 BYD: <span id="qtdLaranja">0</span></p>
   <p>🟣 Stellantis: <span id="qtdRoxo">0</span></p>
+
+  <!-- ✅ CONTROLE TOTAL -->
+  <div id="controleGlobal">
+    <label>
+      <input type="checkbox" onchange="toggleTodos(this.checked)">
+      ✅ Ativar / Desativar Todos
+    </label>
+  </div>
 </div>
 
-<!-- ✅ CONTROLE TOTAL -->
-<div id="controleTotal">
-  <button onclick="mostrarTodos()">✅ Mostrar Todos</button>
-  <button onclick="ocultarTodos()">❌ Ocultar Todos</button>
-</div>
-
-<!-- ✅ MAPA -->
 <div id="map"></div>
 
-<!-- ✅ JS -->
+<!-- JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
@@ -115,7 +117,7 @@ const map = L.map('map').setView([-23.4543, -46.5337], 11);
 // ✅ CAMADA
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// ✅ BARRA DE BUSCA
+// ✅ BUSCA
 L.Control.geocoder().addTo(map);
 
 // ✅ ÍCONE
@@ -148,14 +150,13 @@ const grupoAmarelo = L.layerGroup();
 const grupoLaranja = L.layerGroup();
 const grupoRoxo = L.layerGroup();
 
-// ✅ FUNÇÃO DE MARKER (SEM HOVER)
+// ✅ MARKER
 function criarMarker(lat, lng, icone, texto, grupo) {
   const marker = L.marker([lat, lng], { icon: icone });
 
   marker.bindPopup(texto);
   marker.bindTooltip(texto);
 
-  // ✅ Animação clique
   marker.on("click", function () {
     this.setIcon(criarIcone("#000000"));
     setTimeout(() => {
@@ -166,14 +167,16 @@ function criarMarker(lat, lng, icone, texto, grupo) {
   marker.addTo(grupo);
 }
 
-// ✅ EXEMPLO
+// ✅ EXEMPLOS (teste)
 criarMarker(-23.55, -46.63, iconeAzul, "Shopping", grupoAzul);
 criarMarker(-23.56, -46.64, iconeVerde, "Loja", grupoVerde);
 
 
 
 
-// ✅ ADICIONAR AO MAPA
+
+
+// ✅ ADD AO MAPA
 grupoAzul.addTo(map);
 grupoVermelho.addTo(map);
 grupoVerde.addTo(map);
@@ -181,33 +184,33 @@ grupoAmarelo.addTo(map);
 grupoLaranja.addTo(map);
 grupoRoxo.addTo(map);
 
-// ✅ CHECKBOX
+// ✅ CHECKBOX LATERAL
 L.control.layers(null, {
   "🔵 Shoppings": grupoAzul,
   "🔴 SPG": grupoVermelho,
-  "🟢 Lojas de Rua Premier": grupoVerde,
+  "🟢 Lojas": grupoVerde,
   "🟡 Honda": grupoAmarelo,
   "🟠 BYD": grupoLaranja,
   "🟣 Stellantis": grupoRoxo
 }, { collapsed: false }).addTo(map);
 
-// ✅ BOTÕES
-function mostrarTodos() {
-  grupoAzul.addTo(map);
-  grupoVermelho.addTo(map);
-  grupoVerde.addTo(map);
-  grupoAmarelo.addTo(map);
-  grupoLaranja.addTo(map);
-  grupoRoxo.addTo(map);
-}
-
-function ocultarTodos() {
-  map.removeLayer(grupoAzul);
-  map.removeLayer(grupoVermelho);
-  map.removeLayer(grupoVerde);
-  map.removeLayer(grupoAmarelo);
-  map.removeLayer(grupoLaranja);
-  map.removeLayer(grupoRoxo);
+// ✅ CONTROLE GLOBAL
+function toggleTodos(ativo) {
+  if (ativo) {
+    grupoAzul.addTo(map);
+    grupoVermelho.addTo(map);
+    grupoVerde.addTo(map);
+    grupoAmarelo.addTo(map);
+    grupoLaranja.addTo(map);
+    grupoRoxo.addTo(map);
+  } else {
+    map.removeLayer(grupoAzul);
+    map.removeLayer(grupoVermelho);
+    map.removeLayer(grupoVerde);
+    map.removeLayer(grupoAmarelo);
+    map.removeLayer(grupoLaranja);
+    map.removeLayer(grupoRoxo);
+  }
 }
 
 // ✅ DASHBOARD
@@ -226,4 +229,3 @@ atualizarDashboard();
 
 </body>
 </html>
-
