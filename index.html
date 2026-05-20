@@ -2,61 +2,49 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8" />
 <title>Mapa DHL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/: 100%;
-  margin: 0;
-}
+<!-- ✅ Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-/* topo */
+<!-- ✅ Cluster -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
+
+<style>
+html, body { height: 100%; margin: 0; }
+
 #topbar {
   position: fixed;
   top: 0;
   width: 100%;
-  height: 60px;
   background: #ffcc00;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
+  text-align: center;
+  padding: 8px;
+  z-index: 1000;
 }
 
-/* mapa */
+#topbar img { width: 120px; }
+
 #map {
+  width: 100%;
   height: calc(100% - 60px);
   margin-top: 60px;
 }
 
-/* dashboard */
+/* ✅ Dashboard */
 #dashboard {
   position: fixed;
   left: 10px;
   top: 80px;
   background: white;
-  padding: 12px;
+  padding: 15px;
   border-radius: 8px;
-  z-index: 1500;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  z-index: 1001;
   font-family: Arial;
-}
-
-/* botões */
-#controleTotal {
-  position: fixed;
-  left: 10px;
-  top: 260px;
-  z-index: 1500;
-}
-
-#controleTotal button {
-  margin: 4px 0;
-  padding: 6px;
-  border: none;
-  border-radius: 5px;
-  background: #ffcc00;
-  cursor: pointer;
 }
 </style>
 </head>
@@ -64,7 +52,10 @@
 <body>
 
 <div id="topbar">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg" height="40board">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg">
+</div>
+
+<div id="dashboard">
   <h3>📊 Resumo</h3>
   <p>🔵 Shoppings: <span id="qtdAzul">0</span></p>
   <p>🔴 SPG: <span id="qtdVermelho">0</span></p>
@@ -74,15 +65,11 @@
   <p>🟣 Stellantis: <span id="qtdRoxo">0</span></p>
 </div>
 
-<div id="controleTotal">
-  <button onclick="mostrarTodos()">✅ Mostrar Todos</button>
-  <button onclick="ocultarTodos()">❌ Ocultar Todos</button>
-</div>
-
 <div id="map"></div>
 
-<!-- scripts -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.jsript src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<!-- ✅ Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
 <script>
 
@@ -91,32 +78,36 @@ const map = L.map('map').setView([-23.4543, -46.5337], 11);
 
 // ✅ CAMADA
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-L.Control.geocoder().addTo(map);
 
-// ✅ FUNÇÃO ÍCONE
-function criarIcone(cor) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">
-  <path fill="${cor}" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>
-  </svg>`;
+// ✅ ÍCONE
+function criarIcone(corHex) {
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">' +
+              '<path fill="' + corHex + '" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>' +
+              '</svg>';
 
   return new L.Icon({
     iconUrl: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
-    iconSize: [25,41],
-    iconAnchor: [12,41]
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
   });
 }
 
 // ✅ CORES
 const iconeAzul = criarIcone("#2962FF");
+const iconeVermelho = criarIcone("#D50000");
 const iconeVerde = criarIcone("#00C853");
+const iconeAmarelo = criarIcone("#FFD600");
+const iconeLaranja = criarIcone("#FF6D00");
+const iconeRoxo = criarIcone("#6A1B9A");
 
-// ✅ GRUPOS
-const grupoAzul = L.layerGroup();
-const grupoVerde = L.layerGroup();
-const grupoVermelho = L.layerGroup();
-const grupoAmarelo = L.layerGroup();
-const grupoLaranja = L.layerGroup();
-const grupoRoxo = L.layerGroup();
+// ✅ CLUSTER (CORRETO)
+const grupoAzul = L.markerClusterGroup();
+const grupoVermelho = L.markerClusterGroup();
+const grupoVerde = L.markerClusterGroup();
+const grupoAmarelo = L.markerClusterGroup();
+const grupoLaranja = L.markerClusterGroup();
+const grupoRoxo = L.markerClusterGroup();
 
 
  // ✅ SHOPPINGS PIN AZUL
@@ -1700,6 +1691,20 @@ L.marker([-23.488315, -46.548983], { icon: iconeAzul })
     .addTo(grupoRoxo)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   L.marker([-23.469119, -46.478465], { icon: iconeVermelho })
     .bindPopup('SPG ✅')
     .addTo(grupoVermelho);
@@ -1708,44 +1713,15 @@ L.marker([-23.488315, -46.548983], { icon: iconeAzul })
 
 
 
-// ✅ ADICIONAR AO MAPA
-grupoAzul.addTo(map);
-grupoVerde.addTo(map);
-grupoVermelho.addTo(map);
-grupoAmarelo.addTo(map);
-grupoLaranja.addTo(map);
-grupoRoxo.addTo(map);
+// ✅ ADD AO MAPA (OBRIGATÓRIO)
+map.addLayer(grupoAzul);
+map.addLayer(grupoVermelho);
+map.addLayer(grupoVerde);
+map.addLayer(grupoAmarelo);
+map.addLayer(grupoLaranja);
+map.addLayer(grupoRoxo);
 
-// ✅ CONTROLE
-L.control.layers(null, {
-  "🔵 Shoppings": grupoAzul,
-  "🔴 SPG": grupoVermelho,
-  "🟢 Lojas": grupoVerde,
-  "🟡 Honda": grupoAmarelo,
-  "🟠 BYD": grupoLaranja,
-  "🟣 Stellantis": grupoRoxo
-}).addTo(map);
-
-// ✅ BOTÕES
-function mostrarTodos() {
-  grupoAzul.addTo(map);
-  grupoVerde.addTo(map);
-  grupoVermelho.addTo(map);
-  grupoAmarelo.addTo(map);
-  grupoLaranja.addTo(map);
-  grupoRoxo.addTo(map);
-}
-
-function ocultarTodos() {
-  map.removeLayer(grupoAzul);
-  map.removeLayer(grupoVerde);
-  map.removeLayer(grupoVermelho);
-  map.removeLayer(grupoAmarelo);
-  map.removeLayer(grupoLaranja);
-  map.removeLayer(grupoRoxo);
-}
-
-// ✅ DASHBOARD
+// ✅ DASHBOARD (NO FINAL)
 function atualizarDashboard() {
   document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
   document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
@@ -1761,4 +1737,3 @@ atualizarDashboard();
 
 </body>
 </html>
-
