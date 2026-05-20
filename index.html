@@ -39,6 +39,34 @@ function atualizarDashboard() {
 
 atualizarDashboard();
 
+function selecionarTodos(ativo) {
+  if (ativo) {
+    grupoAzul.addTo(map);
+    grupoVermelho.addTo(map);
+    grupoVerde.addTo(map);
+    grupoAmarelo.addTo(map);
+    grupoLaranja.addTo(map);
+    grupoRoxo.addTo(map);
+
+    // desmarca o outro
+    document.getElementById("checkNenhum").checked = false;
+  }
+}
+
+function removerTodos(ativo) {
+  if (ativo) {
+    map.removeLayer(grupoAzul);
+    map.removeLayer(grupoVermelho);
+    map.removeLayer(grupoVerde);
+    map.removeLayer(grupoAmarelo);
+    map.removeLayer(grupoLaranja);
+    map.removeLayer(grupoRoxo);
+
+    // desmarca o outro
+    document.getElementById("checkTodos").checked = false;
+  }
+}
+``
 </script>
 
 </body>
@@ -92,6 +120,18 @@ html, body { height: 100%; margin: 0; }
 <!-- ✅ DASHBOARD -->
 <div id="dashboard">
   <h3>📊 Resumo</h3>
+  
+ <label>
+    <input type="checkbox" id="checkTodos" onchange="selecionarTodos(this.checked)">
+    ✅ Selecionar Todos
+  </label>
+  <br>
+  <label>
+    <input type="checkbox" id="checkNenhum" onchange="removerTodos(this.checked)">
+    ❌ Remover Todos
+  </label>
+</div>
+
   <p>🔵 Shoppings: <span id="qtdAzul">0</span></p>
   <p>🔴 SPG: <span id="qtdVermelho">0</span></p>
   <p>🟢 Lojas de Rua Premier: <span id="qtdVerde">0</span></p>
@@ -1766,6 +1806,48 @@ function atualizarDashboard() {
 }
 
 atualizarDashboard();
+
+function selecionarTodos(ativo) {
+  if (ativo) {
+    grupoAzul.addTo(map);
+    grupoVermelho.addTo(map);
+    grupoVerde.addTo(map);
+    grupoAmarelo.addTo(map);
+    grupoLaranja.addTo(map);
+    grupoRoxo.addTo(map);
+
+    document.getElementById("checkNenhum").checked = false;
+  }
+}
+
+function removerTodos(ativo) {
+  if (ativo) {
+    map.removeLayer(grupoAzul);
+    map.removeLayer(grupoVermelho);
+    map.removeLayer(grupoVerde);
+    map.removeLayer(grupoAmarelo);
+    map.removeLayer(grupoLaranja);
+    map.removeLayer(grupoRoxo);
+
+    document.getElementById("checkTodos").checked = false;
+  }
+}
+
+map.on('overlayadd', atualizarCheckboxes);
+map.on('overlayremove', atualizarCheckboxes);
+
+function atualizarCheckboxes() {
+  const totalVisivel =
+    (map.hasLayer(grupoAzul) ? 1 : 0) +
+    (map.hasLayer(grupoVermelho) ? 1 : 0) +
+    (map.hasLayer(grupoVerde) ? 1 : 0) +
+    (map.hasLayer(grupoAmarelo) ? 1 : 0) +
+    (map.hasLayer(grupoLaranja) ? 1 : 0) +
+    (map.hasLayer(grupoRoxo) ? 1 : 0);
+
+  document.getElementById("checkTodos").checked = (totalVisivel === 6);
+  document.getElementById("checkNenhum").checked = (totalVisivel === 0);
+}
 
 </script>
 
