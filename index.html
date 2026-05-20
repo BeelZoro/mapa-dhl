@@ -1860,6 +1860,48 @@ function atualizarDashboard() {
 }
 
 atualizarDashboard();
+  
+// EXPORT EXCEL
+function exportarParaExcel() {
+  const dados = [];
+
+  function extrairGrupo(grupo, tipo) {
+    grupo.eachLayer(layer => {
+      const nome = layer.getPopup()?.getContent() || "";
+      const latlng = layer.getLatLng();
+
+      dados.push({
+        nome: nome,
+        lat: latlng.lat,
+        lng: latlng.lng,
+        tipo: tipo
+      });
+    });
+  }
+
+  extrairGrupo(grupoAzul, "azul");
+  extrairGrupo(grupoVerde, "verde");
+  extrairGrupo(grupoAmarelo, "amarelo");
+  extrairGrupo(grupoVermelho, "vermelho");
+  extrairGrupo(grupoLaranja, "laranja");
+  extrairGrupo(grupoRoxo, "roxo");
+
+  console.log("DADOS EXPORTADOS:");
+  console.table(dados);
+
+  // CSV
+  let csv = "nome,lat,lng,tipo\n";
+  dados.forEach(row => {
+    csv += `"${row.nome}",${row.lat},${row.lng},${row.tipo}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+
+  link.href = URL.createObjectURL(blob);
+  link.download = "dados_mapa.csv";
+  link.click();
+}
 
 </script>
 
