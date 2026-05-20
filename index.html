@@ -78,26 +78,6 @@ html, body { height: 100%; margin: 0; }
   z-index: 1001;
   font-family: Arial;
 }
-
-  
-#controleTotal {
-  position: fixed;
-  left: 10px;
-  top: 260px;
-  z-index: 1001;
-}
-
-#controleTotal button {
-  display: block;
-  margin: 5px 0;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 6px;
-  background: #ffcc00;
-  cursor: pointer;
-  font-weight: bold;
-}
-
 </style>
 
 </head>
@@ -1774,24 +1754,6 @@ L.control.layers(null, {
   "🟠 BYD": grupoLaranja,
   "🟣 Stellantis": grupoRoxo
 }, { collapsed: false }).addTo(map);
-
-function mostrarTodos() {
-  grupoAzul.addTo(map);
-  grupoVermelho.addTo(map);
-  grupoVerde.addTo(map);
-  grupoAmarelo.addTo(map);
-  grupoLaranja.addTo(map);
-  grupoRoxo.addTo(map);
-}
-
-function ocultarTodos() {
-  map.removeLayer(grupoAzul);
-  map.removeLayer(grupoVermelho);
-  map.removeLayer(grupoVerde);
-  map.removeLayer(grupoAmarelo);
-  map.removeLayer(grupoLaranja);
-  map.removeLayer(grupoRoxo);
-}
 
 // ✅ DASHBOARD
 function atualizarDashboard() {
