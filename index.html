@@ -1,122 +1,122 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="utf-8" />
+<meta charset="utf-8">
 <title>Mapa DHL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
-
+<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
 
 <style>
-  html, body {
-    height: 100%;
-    margin: 0;
-  }
+html, body { height: 100%; margin: 0; }
 
-  #topbar {
-    position: fixed;
-    top: 0;
-    width: 100%;
-    background: #ffcc00;
-    text-align: center;
-    padding: 8px;
-    z-index: 1000;
-  }
+/* topo */
+#topbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 60px;
+  background: #ffcc00;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
 
-  #topbar img {
-    width: 120px;
-  }
+/* mapa */
+#map {
+  height: calc(100% - 60px);
+  margin-top: 60px;
+}
 
-  #map {
-    width: 100%;
-    height: calc(100% - 60px);
-    margin-top: 60px;
-  }
-
+/* dashboard */
 #dashboard {
   position: fixed;
   left: 10px;
   top: 80px;
   background: white;
-  padding: 15px;
+  padding: 12px;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  z-index: 1001;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
+  z-index: 1500;
+  font-family: Arial;
 }
-
 </style>
 </head>
 
 <body>
 
 <div id="topbar">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg" height="40">
+</div>
 
 <div id="dashboard">
   <h3>📊 Resumo</h3>
+
+  <label>
+    <input type="checkbox" id="checkTodos" onchange="selecionarTodos(this.checked)">
+    ✅ Selecionar Todos
+  </label><br>
+
+  <label>
+    <input type="checkbox" id="checkNenhum" onchange="removerTodos(this.checked)">
+    ❌ Remover Todos
+  </label>
+
+  <hr>
+
   <p>🔵 Shoppings: <span id="qtdAzul">0</span></p>
   <p>🔴 SPG: <span id="qtdVermelho">0</span></p>
-  <p>🟢 Lojas de Rua Premier: <span id="qtdVerde">0</span></p>
+  <p>🟢 Lojas: <span id="qtdVerde">0</span></p>
   <p>🟡 Honda: <span id="qtdAmarelo">0</span></p>
   <p>🟠 BYD: <span id="qtdLaranja">0</span></p>
   <p>🟣 Stellantis: <span id="qtdRoxo">0</span></p>
 </div>
 
-  <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg">
-</div>
-
 <div id="map"></div>
 
+<!-- JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js</script>
+
 <script>
 
 // ✅ MAPA
 const map = L.map('map').setView([-23.4543, -46.5337], 11);
 
-// ✅ TILE
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '© OpenStreetMap'
-}).addTo(map);
-
-// ✅ BUSCA
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 L.Control.geocoder().addTo(map);
 
-// ✅ GERADOR DE ÍCONE (CORRIGIDO)
-function criarIcone(corHex) {
-  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">' +
-              '<path stroke="black" stroke-width="1" fill="' + corHex + '" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>' +
-              '</svg>';
+// ✅ FUNÇÃO ÍCONE
+function criarIcone(cor) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">
+    <path fill="${cor}" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>
+  </svg>`;
 
   return new L.Icon({
     iconUrl: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
+    iconSize: [25,41],
+    iconAnchor: [12,41]
   });
 }
 
 // ✅ CORES
-const iconeAzul     = criarIcone("#2962FF");
+const iconeAzul = criarIcone("#2962FF");
 const iconeVermelho = criarIcone("#D50000");
-const iconeVerde    = criarIcone("#00C853");
-const iconeAmarelo  = criarIcone("#FFD600");
-const iconeLaranja  = criarIcone("#FF6D00");
-const iconeRoxo     = criarIcone("#6A1B9A");
+const iconeVerde = criarIcone("#00C853");
+const iconeAmarelo = criarIcone("#FFD600");
+const iconeLaranja = criarIcone("#FF6D00");
+const iconeRoxo = criarIcone("#6A1B9A");
 
 // ✅ GRUPOS
-const grupoAzul = L.markerClusterGroup();
-const grupoVermelho = L.markerClusterGroup();
-const grupoVerde = L.markerClusterGroup();
-const grupoAmarelo = L.markerClusterGroup();
-const grupoLaranja = L.markerClusterGroup();
-const grupoRoxo = L.markerClusterGroup();
+const grupoAzul = L.layerGroup();
+const grupoVermelho = L.layerGroup();
+const grupoVerde = L.layerGroup();
+const grupoAmarelo = L.layerGroup();
+const grupoLaranja = L.layerGroup();
+const grupoRoxo = L.layerGroup();
 
  // ✅ SHOPPINGS PIN AZUL
 
@@ -1720,7 +1720,16 @@ L.marker([-23.488315, -46.548983], { icon: iconeAzul })
 
 
 
-// ✅ CONTROLE
+
+// ✅ ADICIONAR AO MAPA
+grupoAzul.addTo(map);
+grupoVermelho.addTo(map);
+grupoVerde.addTo(map);
+grupoAmarelo.addTo(map);
+grupoLaranja.addTo(map);
+grupoRoxo.addTo(map);
+
+// ✅ CONTROLE LATERAL
 L.control.layers(null, {
   "🔵 Shoppings": grupoAzul,
   "🔴 SPG": grupoVermelho,
@@ -1728,9 +1737,36 @@ L.control.layers(null, {
   "🟡 Honda": grupoAmarelo,
   "🟠 BYD": grupoLaranja,
   "🟣 Stellantis": grupoRoxo
-}, { collapsed: false }).addTo(map);
+}, {collapsed:false}).addTo(map);
 
+// ✅ CHECKBOX GLOBAL
+function selecionarTodos(ativo) {
+  if (ativo) {
+    grupoAzul.addTo(map);
+    grupoVermelho.addTo(map);
+    grupoVerde.addTo(map);
+    grupoAmarelo.addTo(map);
+    grupoLaranja.addTo(map);
+    grupoRoxo.addTo(map);
 
+    document.getElementById("checkNenhum").checked = false;
+  }
+}
+
+function removerTodos(ativo) {
+  if (ativo) {
+    map.removeLayer(grupoAzul);
+    map.removeLayer(grupoVermelho);
+    map.removeLayer(grupoVerde);
+    map.removeLayer(grupoAmarelo);
+    map.removeLayer(grupoLaranja);
+    map.removeLayer(grupoRoxo);
+
+    document.getElementById("checkTodos").checked = false;
+  }
+}
+
+// ✅ DASHBOARD
 function atualizarDashboard() {
   document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
   document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
@@ -1740,11 +1776,10 @@ function atualizarDashboard() {
   document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
 }
 
-// ✅ Atualiza ao carregar
 atualizarDashboard();
 
 </script>
 
 </body>
 </html>
-``
+
