@@ -9,10 +9,6 @@
 <!-- ✅ Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-<!-- ✅ Cluster -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css"/>
-
 <style>
 html, body { height: 100%; margin: 0; }
 
@@ -51,25 +47,27 @@ html, body { height: 100%; margin: 0; }
 
 <body>
 
+<!-- ✅ LOGO -->
 <div id="topbar">
   <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg">
 </div>
 
+<!-- ✅ DASHBOARD -->
 <div id="dashboard">
   <h3>📊 Resumo</h3>
   <p>🔵 Shoppings: <span id="qtdAzul">0</span></p>
   <p>🔴 SPG: <span id="qtdVermelho">0</span></p>
-  <p>🟢 Lojas: <span id="qtdVerde">0</span></p>
+  <p>🟢 Lojas de Rua Premier: <span id="qtdVerde">0</span></p>
   <p>🟡 Honda: <span id="qtdAmarelo">0</span></p>
   <p>🟠 BYD: <span id="qtdLaranja">0</span></p>
   <p>🟣 Stellantis: <span id="qtdRoxo">0</span></p>
 </div>
 
+<!-- ✅ MAPA -->
 <div id="map"></div>
 
-<!-- ✅ Scripts -->
+<!-- ✅ SCRIPT -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
 
 <script>
 
@@ -79,7 +77,7 @@ const map = L.map('map').setView([-23.4543, -46.5337], 11);
 // ✅ CAMADA
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-// ✅ ÍCONE
+// ✅ FUNÇÃO DE ÍCONE
 function criarIcone(corHex) {
   const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">' +
               '<path fill="' + corHex + '" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>' +
@@ -101,13 +99,13 @@ const iconeAmarelo = criarIcone("#FFD600");
 const iconeLaranja = criarIcone("#FF6D00");
 const iconeRoxo = criarIcone("#6A1B9A");
 
-// ✅ CLUSTER (CORRETO)
-const grupoAzul = L.markerClusterGroup();
-const grupoVermelho = L.markerClusterGroup();
-const grupoVerde = L.markerClusterGroup();
-const grupoAmarelo = L.markerClusterGroup();
-const grupoLaranja = L.markerClusterGroup();
-const grupoRoxo = L.markerClusterGroup();
+// ✅ GRUPOS (SEM CLUSTER)
+const grupoAzul = L.layerGroup();
+const grupoVermelho = L.layerGroup();
+const grupoVerde = L.layerGroup();
+const grupoAmarelo = L.layerGroup();
+const grupoLaranja = L.layerGroup();
+const grupoRoxo = L.layerGroup();
 
 
  // ✅ SHOPPINGS PIN AZUL
@@ -1696,15 +1694,26 @@ L.marker([-23.488315, -46.548983], { icon: iconeAzul })
     .addTo(grupoVermelho);
 
 
-// ✅ ADD AO MAPA (OBRIGATÓRIO)
-map.addLayer(grupoAzul);
-map.addLayer(grupoVermelho);
-map.addLayer(grupoVerde);
-map.addLayer(grupoAmarelo);
-map.addLayer(grupoLaranja);
-map.addLayer(grupoRoxo);
 
-// ✅ DASHBOARD (NO FINAL)
+// ✅ ADICIONAR NO MAPA
+grupoAzul.addTo(map);
+grupoVermelho.addTo(map);
+grupoVerde.addTo(map);
+grupoAmarelo.addTo(map);
+grupoLaranja.addTo(map);
+grupoRoxo.addTo(map);
+
+// ✅ CHECKBOX (CONTROLE)
+L.control.layers(null, {
+  "🔵 Shoppings": grupoAzul,
+  "🔴 SPG": grupoVermelho,
+  "🟢 Lojas de Rua Premier": grupoVerde,
+  "🟡 Honda": grupoAmarelo,
+  "🟠 BYD": grupoLaranja,
+  "🟣 Stellantis": grupoRoxo
+}, { collapsed: false }).addTo(map);
+
+// ✅ DASHBOARD
 function atualizarDashboard() {
   document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
   document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
