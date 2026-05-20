@@ -1,52 +1,13 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="utf-8" />
+<meta charset="utf-8">
 <title>Mapa DHL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- ✅ Leaflet -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
-  
-// ✅ ADICIONAR NO MAPA
-grupoAzul.addTo(map);
-grupoVermelho.addTo(map);
-grupoVerde.addTo(map);
-grupoAmarelo.addTo(map);
-grupoLaranja.addTo(map);
-grupoRoxo.addTo(map);
-
-// ✅ CHECKBOX (CONTROLE)
-L.control.layers(null, {
-  "🔵 Shoppings": grupoAzul,
-  "🔴 SPG": grupoVermelho,
-  "🟢 Lojas de Rua Premier": grupoVerde,
-  "🟡 Honda": grupoAmarelo,
-  "🟠 BYD": grupoLaranja,
-  "🟣 Stellantis": grupoRoxo
-}, { collapsed: false }).addTo(map);
-
-// ✅ DASHBOARD
-function atualizarDashboard() {
-  document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
-  document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
-  document.getElementById("qtdVerde").innerText = grupoVerde.getLayers().length;
-  document.getElementById("qtdAmarelo").innerText = grupoAmarelo.getLayers().length;
-  document.getElementById("qtdLaranja").innerText = grupoLaranja.getLayers().length;
-  document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
-}
-
-atualizarDashboard();
-
-</script>
-
-</body>
-</html>
-``
-
-<style>
-html, body { height: 100%; margin: 0; }
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leafletref="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/100%; margin: 0; }
 
 #topbar {
   position: fixed;
@@ -55,18 +16,14 @@ html, body { height: 100%; margin: 0; }
   background: #ffcc00;
   text-align: center;
   padding: 8px;
-  z-index: 1000;
+  z-index: 2000;
 }
 
-#topbar img { width: 120px; }
-
 #map {
-  width: 100%;
   height: calc(100% - 60px);
   margin-top: 60px;
 }
 
-/* ✅ Dashboard */
 #dashboard {
   position: fixed;
   left: 10px;
@@ -74,47 +31,30 @@ html, body { height: 100%; margin: 0; }
   background: white;
   padding: 15px;
   border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  z-index: 1001;
+  z-index: 1500;
   font-family: Arial;
 }
 
-  
 #controleTotal {
   position: fixed;
   left: 10px;
   top: 260px;
-  z-index: 1001;
+  z-index: 1500;
 }
-
-#controleTotal button {
-  display: block;
-  margin: 5px 0;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 6px;
-  background: #ffcc00;
-  cursor: pointer;
-  font-weight: bold;
-}
-
 </style>
-
 </head>
 
 <body>
 
-<!-- ✅ LOGO -->
 <div id="topbar">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg" width="120">
 </div>
 
-<!-- ✅ DASHBOARD -->
 <div id="dashboard">
   <h3>📊 Resumo</h3>
   <p>🔵 Shoppings: <span id="qtdAzul">0</span></p>
   <p>🔴 SPG: <span id="qtdVermelho">0</span></p>
-  <p>🟢 Lojas de Rua Premier: <span id="qtdVerde">0</span></p>
+  <p>🟢 Lojas: <span id="qtdVerde">0</span></p>
   <p>🟡 Honda: <span id="qtdAmarelo">0</span></p>
   <p>🟠 BYD: <span id="qtdLaranja">0</span></p>
   <p>🟣 Stellantis: <span id="qtdRoxo">0</span></p>
@@ -125,30 +65,28 @@ html, body { height: 100%; margin: 0; }
   <button onclick="ocultarTodos()">❌ Ocultar Todos</button>
 </div>
 
-<!-- ✅ MAPA -->
 <div id="map"></div>
 
-<!-- ✅ SCRIPT -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-  
+
 <script>
+
 // ✅ MAPA
 const map = L.map('map').setView([-23.4543, -46.5337], 11);
 
 // ✅ CAMADA
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 L.Control.geocoder().addTo(map);
-  
-// ✅ FUNÇÃO DE ÍCONE
+
+// ✅ ÍCONE
 function criarIcone(corHex) {
-  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">' +
-              '<path fill="' + corHex + '" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>' +
-              '</svg>';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">
+  <path fill="${corHex}" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>
+  </svg>`;
 
   return new L.Icon({
     iconUrl: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
     iconSize: [25, 41],
     iconAnchor: [12, 41]
   });
@@ -162,7 +100,7 @@ const iconeAmarelo = criarIcone("#FFD600");
 const iconeLaranja = criarIcone("#FF6D00");
 const iconeRoxo = criarIcone("#6A1B9A");
 
-// ✅ GRUPOS (SEM CLUSTER)
+// ✅ GRUPOS
 const grupoAzul = L.layerGroup();
 const grupoVermelho = L.layerGroup();
 const grupoVerde = L.layerGroup();
@@ -1757,7 +1695,8 @@ L.marker([-23.488315, -46.548983], { icon: iconeAzul })
 
 
 
-// ✅ ADICIONAR NO MAPA
+
+/ ✅ ADICIONA AO MAPA
 grupoAzul.addTo(map);
 grupoVermelho.addTo(map);
 grupoVerde.addTo(map);
@@ -1765,16 +1704,17 @@ grupoAmarelo.addTo(map);
 grupoLaranja.addTo(map);
 grupoRoxo.addTo(map);
 
-// ✅ CHECKBOX (CONTROLE)
+// ✅ CONTROLE LATERAL
 L.control.layers(null, {
   "🔵 Shoppings": grupoAzul,
   "🔴 SPG": grupoVermelho,
-  "🟢 Lojas de Rua Premier": grupoVerde,
+  "🟢 Lojas": grupoVerde,
   "🟡 Honda": grupoAmarelo,
   "🟠 BYD": grupoLaranja,
   "🟣 Stellantis": grupoRoxo
-}, { collapsed: false }).addTo(map);
+}).addTo(map);
 
+// ✅ BOTÕES
 function mostrarTodos() {
   grupoAzul.addTo(map);
   grupoVermelho.addTo(map);
@@ -1809,3 +1749,4 @@ atualizarDashboard();
 
 </body>
 </html>
+
