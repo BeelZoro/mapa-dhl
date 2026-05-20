@@ -1862,6 +1862,7 @@ function atualizarDashboard() {
 atualizarDashboard();
   
 // EXPORT EXCEL
+
 function exportarParaExcel() {
   const dados = [];
 
@@ -1886,10 +1887,8 @@ function exportarParaExcel() {
   extrairGrupo(grupoLaranja, "laranja");
   extrairGrupo(grupoRoxo, "roxo");
 
-  console.log("DADOS EXPORTADOS:");
   console.table(dados);
 
-  // CSV
   let csv = "nome,lat,lng,tipo\n";
   dados.forEach(row => {
     csv += `"${row.nome}",${row.lat},${row.lng},${row.tipo}\n`;
@@ -1902,7 +1901,7 @@ function exportarParaExcel() {
   link.download = "dados_mapa.csv";
   link.click();
 }
-
+``
 </script>
 
 </body>
