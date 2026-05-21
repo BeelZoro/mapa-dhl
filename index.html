@@ -42,59 +42,59 @@ font-family: Arial;
 
 /* CONTAINER FIXO */
 .painel-upload {
-position: fixed;
-bottom: 0px;
-right: 0px;
-z-index: 9999;
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  z-index: 9999;
 
-background: white;
-padding: 15px;
-border-radius: 12px 0 0 0;
+  background: white;
+  padding: 15px;
+  border-radius: 12px 0 0 0;
 
-box-shadow: -2px -2px 12px rgba(0,0,0,0.15);
+  box-shadow: -2px -2px 12px rgba(0,0,0,0.15);
 }
 
 /* BOTÕES */
 .botao {
-display: block;
-width: 100%;
-margin-top: 8px;
+  display: block;
+  width: 100%;
+  margin-top: 8px;
 
-padding: 10px;
-border-radius: 8px;
-border: none;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
 
-font-size: 14px;
-font-weight: 600;
-cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
 
-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 /* BOTÃO PRINCIPAL */
 .botao-principal {
-background: linear-gradient(135deg, #ffcc00, #ff9900);
-color: #000;
+  background: linear-gradient(135deg, #ffcc00, #ff9900);
+  color: #000;
 }
 
 .botao-principal:hover {
-transform: scale(1.05);
-box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
 /* BOTÃO SECUNDÁRIO */
 .botao-secundario {
-background: #f5f5f5;
-color: #333;
+  background: #f5f5f5;
+  color: #333;
 }
 
 .botao-secundario:hover {
-background: #e0e0e0;
+  background: #e0e0e0;
 }
 
 /* INPUT */
 .input-file {
-font-size: 13px;
+  font-size: 13px;
 }
 
 </style>
@@ -143,15 +143,15 @@ font-size: 13px;
   <button onclick="enviarParaGitHub()">⬆️ Enviar</button>
 
 <div class="painel-upload">
-<input type="file" id="uploadExcel" accept=".xlsx" class="input-file">
+  <input type="file" id="uploadExcel" accept=".xlsx" class="input-file">
 
-<button class="botao botao-principal" onclick="enviarParaGitHub()">
-🚀 Atualizar Mapa
-</button>
+  <button class="botao botao-principal" onclick="enviarParaGitHub()">
+    🚀 Atualizar Mapa
+  </button>
 
-<button class="botao botao-secundario" onclick="location.reload()">
-🔄 Recarregar
-</button>
+  <button class="botao botao-secundario" onclick="location.reload()">
+    🔄 Recarregar
+  </button>
 
 </div>
 
@@ -160,7 +160,42 @@ font-size: 13px;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-@@ -196,61 +187,57 @@
+
+<script>
+
+// ✅ MAPA
+const map = L.map('map').setView([-23.4543, -46.5337], 11);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+L.Control.geocoder().addTo(map);
+
+// ✅ ÍCONES
+function criarIcone(cor) {
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">
+  <path fill="${cor}" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>
+</svg>`;
+
+return new L.Icon({
+iconUrl: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
+iconSize: [25,41],
+iconAnchor: [12,41]
+});
+}
+
+// ✅ CORES
+const iconeAzul = criarIcone("#2962FF");
+const iconeVermelho = criarIcone("#D50000");
+const iconeVerde = criarIcone("#00C853");
+const iconeAmarelo = criarIcone("#FFD600");
+const iconeLaranja = criarIcone("#FF6D00");
+const iconeRoxo = criarIcone("#6A1B9A");
+
+// ✅ GRUPOS
+const grupoAzul = L.layerGroup().addTo(map);
+const grupoVermelho = L.layerGroup().addTo(map);
+const grupoVerde = L.layerGroup().addTo(map);
+const grupoAmarelo = L.layerGroup().addTo(map);
+const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 
 // ✅ FETCH CSV
@@ -255,3 +290,117 @@ atualizarDashboard();
   });
 
 async function enviarParaGitHub() {
+
+const file = document.getElementById('uploadExcel').files[0];
+
+if (!file) {
+alert("Selecione um arquivo!");
+return;
+}
+
+const token = prompt("Cole seu token do GitHub:");
+
+if (!token) {
+alert("Token é obrigatório!");
+return;
+}
+
+const base64 = await new Promise(resolve => {
+const reader = new FileReader();
+reader.onload = () => resolve(reader.result.split(',')[1]);
+reader.readAsDataURL(file);
+});
+
+let sha = null;
+
+const getFile = await fetch(
+"https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx?ref=main",
+{
+headers: {
+"Authorization": "token " + token
+}
+}
+);
+
+if (getFile.ok) {
+const data = await getFile.json();
+sha = data.sha;
+}
+
+const upload = await fetch(
+"https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx",
+{
+method: "PUT",
+headers: {
+"Authorization": "token " + token,
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+message: "Atualização via site",
+content: base64,
+sha: sha,
+branch: "main"
+})
+}
+);
+
+const result = await upload.json();
+
+if (upload.ok) {
+alert("✅ Upload realizado com sucesso!");
+location.reload();
+} else {
+console.error(result);
+alert("Erro: " + (result.message || "ver console"));
+}
+
+}
+
+
+// ✅ CONTROLE
+L.control.layers(null, {
+"🔵 Shoppings": grupoAzul,
+"🔴 SPG": grupoVermelho,
+"🟢 Lojas": grupoVerde,
+"🟡 Honda": grupoAmarelo,
+"🟠 BYD": grupoLaranja,
+"🟣 Stellantis": grupoRoxo
+}, {collapsed:false}).addTo(map);
+
+// ✅ CHECKBOX
+function selecionarTodos(ativo) {
+if (ativo) {
+grupoAzul.addTo(map);
+grupoVerde.addTo(map);
+grupoVermelho.addTo(map);
+grupoAmarelo.addTo(map);
+grupoLaranja.addTo(map);
+grupoRoxo.addTo(map);
+}
+}
+
+function removerTodos(ativo) {
+if (ativo) {
+map.removeLayer(grupoAzul);
+map.removeLayer(grupoVerde);
+map.removeLayer(grupoVermelho);
+map.removeLayer(grupoAmarelo);
+map.removeLayer(grupoLaranja);
+map.removeLayer(grupoRoxo);
+}
+}
+
+// ✅ DASHBOARD
+function atualizarDashboard() {
+document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
+document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
+document.getElementById("qtdVerde").innerText = grupoVerde.getLayers().length;
+document.getElementById("qtdAmarelo").innerText = grupoAmarelo.getLayers().length;
+document.getElementById("qtdLaranja").innerText = grupoLaranja.getLayers().length;
+document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
+}
+
+</script>
+
+</body>
+</html>
