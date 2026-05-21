@@ -113,43 +113,53 @@ const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 
 // ✅ FETCH CSV
+
 fetch('dados_mapa.csv')
-  .then(res => res.text())
-  .then(csv => {
+.then(res => res.text())
+.then(text => {
 
-    const linhas = csv.split('\n').slice(1);
+  const linhas = text.split('\n').slice(1);
+  const unicos = new Set();
 
-    linhas.forEach(linha => {
+  linhas.forEach(l => {
 
-      if (!linha.trim()) return;
+    if (!l.trim()) return;
 
-      const c = linha.split(',');
+    let c = l.split(',');
 
-      const nome = c[0]?.replace(/"/g, '');
-      const lat = parseFloat(c[1]);
-      const lng = parseFloat(c[2]);
-      const tipo = c[3]?.trim();
+    let nome = c[0]
+      .replace(/"/g, '')
+      .replace(/\\n/g, ' ')
+      .replace(/\\/g, '')
+      .trim();
 
-      let icone, grupo;
+    const lat = parseFloat(c[1]);
+    const lng = parseFloat(c[2]);
+    const tipo = c[3]?.trim();
 
-      if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
-      else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
-      else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
-      else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
-      else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
-      else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
+    const chave = nome + lat + lng + tipo;
+    if (unicos.has(chave)) return;
+    unicos.add(chave);
 
-      if (!isNaN(lat) && !isNaN(lng) && grupo) {
-        L.marker([lat, lng], { icon: icone })
-          .bindPopup(nome)
-          .addTo(grupo);
-      }
+    let icone, grupo;
 
-    });
+    if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
+    else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
+    else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
+    else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
+    else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
+    else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
 
-    atualizarDashboard();
+    if (!isNaN(lat) && !isNaN(lng) && grupo) {
+      L.marker([lat, lng], { icon: icone })
+        .bindPopup(nome)
+        .addTo(grupo);
+    }
 
   });
+
+  atualizarDashboard();
+});
 
 // ✅ CONTROLE
 L.control.layers(null, {
