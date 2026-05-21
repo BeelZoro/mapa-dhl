@@ -181,15 +181,20 @@ fetch('dados_mapa.xlsx')
 
 async function enviarParaGitHub() {
 
-  const input = document.getElementById('uploadExcel');
-  const file = input.files[0];
+  const file = document.getElementById('uploadExcel').files[0];
 
   if (!file) {
     alert("Selecione um arquivo!");
     return;
   }
 
-  const token = "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";
+  // 🔒 token digitado na hora (não fica salvo)
+  const token = prompt("Cole seu token do GitHub:");
+
+  if (!token) {
+    alert("Token é obrigatório!");
+    return;
+  }
 
   // converter para base64
   const base64 = await new Promise(resolve => {
@@ -200,7 +205,7 @@ async function enviarParaGitHub() {
 
   let sha = null;
 
-  // ✅ IMPORTANTE: buscar SHA com branch correta
+  // ✅ buscar SHA corretamente
   const getFile = await fetch(
     "https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx?ref=main",
     {
@@ -209,6 +214,43 @@ async function enviarParaGitHub() {
       }
     }
   );
+
+  if (getFile.ok) {
+    const data = await getFile.json();
+    sha = data.sha;
+  } else {
+    console.log("Arquivo não existe ainda, será criado");
+  }
+
+  // ✅ enviar arquivo
+  const upload = await fetch(
+    "https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx",
+    {
+      method: "PUT",
+      headers: {
+        "Authorization": "token " + token,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        message: "Atualização via sistema web",
+        content: base64,
+        sha: sha,
+        branch: "main"
+      })
+    }
+  );
+
+  const result = await upload.json();
+
+  if (upload.ok) {
+    alert("✅ Upload realizado com sucesso!");
+    location.reload();
+  } else {
+    console.error(result);
+    alert("Erro: " + (result.message || "ver console"));
+  }
+
+}
 
   if (getFile.ok) {
     const json = await getFile.json();
