@@ -118,7 +118,6 @@ const grupoAmarelo = L.layerGroup();
 const grupoLaranja = L.layerGroup();
 const grupoRoxo = L.layerGroup();
 
-
 fetch('dados_mapa.csv')
   .then(response => response.text())
   .then(csv => {
@@ -169,21 +168,6 @@ fetch('dados_mapa.csv')
     atualizarDashboard();
 
   });
-``
-
-      // ✅ criar marker
-      if (lat && lng && grupo) {
-        L.marker([lat, lng], { icon: icone })
-          .bindPopup(nome)
-          .addTo(grupo);
-      }
-    });
-
-    // ✅ atualizar dashboard depois de carregar
-    atualizarDashboard();
-
-  });
-
 
 // ✅ ADICIONAR AO MAPA
 grupoAzul.addTo(map);
