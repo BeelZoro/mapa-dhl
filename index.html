@@ -199,74 +199,38 @@ const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 
 // ✅ FETCH CSV
-fetch('dados_mapa.xlsx?v=' + Date.now())
-.then(res => res.arrayBuffer())
-.then(data => {
-// seu código XLSX
-});
 
-
-const workbook = XLSX.read(data, { type: 'array' });
 fetch('dados_mapa.xlsx?v=' + Date.now())
   .then(res => res.arrayBuffer())
   .then(data => {
 
-// pegar primeira aba
-const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const workbook = XLSX.read(data, { type: 'array' });
 
-// converter para JSON
-const json = XLSX.utils.sheet_to_json(sheet);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-const unicos = new Set();
     const json = XLSX.utils.sheet_to_json(sheet);
 
-json.forEach(linha => {
     const unicos = new Set();
 
-let nome = (linha.nome || "")
-.toString()
-.replace(/\n/g, ' ')
-.trim();
     json.forEach(linha => {
 
-let lat = parseFloat(linha.lat);
-let lng = parseFloat(linha.lng);
-let tipo = (linha.tipo || "").toString().trim().toLowerCase();
       let nome = (linha.nome || "")
         .toString()
         .replace(/\n/g, ' ')
         .trim();
 
-if (!nome || isNaN(lat) || isNaN(lng)) return;
       let lat = parseFloat(linha.lat);
       let lng = parseFloat(linha.lng);
       let tipo = (linha.tipo || "").toLowerCase();
 
-const chave = nome + lat + lng + tipo;
-if (unicos.has(chave)) return;
-unicos.add(chave);
       if (!nome || isNaN(lat) || isNaN(lng)) return;
 
-let icone, grupo;
       const chave = nome + lat + lng + tipo;
       if (unicos.has(chave)) return;
       unicos.add(chave);
 
-if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
-else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
-else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
-else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
-else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
-else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
       let icone, grupo;
 
-if (grupo) {
-L.marker([lat, lng], { icon: icone })
-.bindPopup(nome)
-.addTo(grupo);
-}
       if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
       else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
       else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
@@ -274,20 +238,18 @@ L.marker([lat, lng], { icon: icone })
       else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
       else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
 
-});
       if (grupo) {
         L.marker([lat, lng], { icon: icone })
           .bindPopup(nome)
           .addTo(grupo);
       }
 
-atualizarDashboard();
     });
 
-});
     atualizarDashboard();
 
   });
+
 
 async function enviarParaGitHub() {
 
