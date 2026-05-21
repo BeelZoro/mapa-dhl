@@ -119,60 +119,57 @@ const grupoLaranja = L.layerGroup();
 const grupoRoxo = L.layerGroup();
 
 
-fetch('dados_mapa.csv')
+fetch('dados.csv')
   .then(response => response.text())
-  .then(text => {
+  .then(csv => {
 
-    // ✅ separar linhas corretamente (respeitando aspas)
-    const linhas = text.match(/(".*?"|[^",\s]+)(?=\s*,|\n|$)/g);
+    const linhas = csv.split('\n').slice(1);
 
-    let dados = [];
-    for (let i = 0; i < linhas.length; i += 4) {
-      dados.push({
-        nome: linhas[i]?.replace(/"/g, ''),
-        lat: parseFloat(linhas[i + 1]),
-        lng: parseFloat(linhas[i + 2]),
-        tipo: linhas[i + 3]
-      });
-    }
+    linhas.forEach(linha => {
 
-    dados.forEach(d => {
+      if (!linha.trim()) return;
 
-      if (!d.lat || !d.lng) return;
+      const colunas = linha.split(',');
+
+      const nome = colunas[0].replace(/"/g, '');
+      const lat = parseFloat(colunas[1]);
+      const lng = parseFloat(colunas[2]);
+      const tipo = colunas[3]?.trim();
 
       let icone, grupo;
 
-      if (d.tipo === "azul") {
+      if (tipo === "azul") {
         icone = iconeAzul;
         grupo = grupoAzul;
-      } else if (d.tipo === "verde") {
+      } else if (tipo === "verde") {
         icone = iconeVerde;
         grupo = grupoVerde;
-      } else if (d.tipo === "amarelo") {
+      } else if (tipo === "amarelo") {
         icone = iconeAmarelo;
         grupo = grupoAmarelo;
-      } else if (d.tipo === "vermelho") {
+      } else if (tipo === "vermelho") {
         icone = iconeVermelho;
         grupo = grupoVermelho;
-      } else if (d.tipo === "laranja") {
+      } else if (tipo === "laranja") {
         icone = iconeLaranja;
         grupo = grupoLaranja;
-      } else if (d.tipo === "roxo") {
+      } else if (tipo === "roxo") {
         icone = iconeRoxo;
         grupo = grupoRoxo;
       }
 
-      if (grupo) {
-        L.marker([d.lat, d.lng], { icon: icone })
-          .bindPopup(d.nome)
+      if (!isNaN(lat) && !isNaN(lng) && grupo) {
+        L.marker([lat, lng], { icon: icone })
+          .bindPopup(nome)
           .addTo(grupo);
       }
 
     });
 
     atualizarDashboard();
-  });
 
+  });
+``
 
       // ✅ criar marker
       if (lat && lng && grupo) {
