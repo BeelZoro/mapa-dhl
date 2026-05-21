@@ -121,9 +121,11 @@ fetch('dados_profissional_mapa.csv')
 
   linhas.slice(1).forEach(l => {
 
-    if (!l.trim()) return;
+    if (!linha.trim() || linha.startsWith(';')) return;
 
-    const c = l.split(',');
+    const c = linha.includes(';')
+        ? linha.split(';')
+        : linha.split(',');
 
     const nome = c[0]?.replace(/"/g,'').trim();
     const lat = parseFloat(c[1]);
