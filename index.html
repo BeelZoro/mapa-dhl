@@ -74,7 +74,8 @@ font-family: Arial;
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+   
 <script>
 
 // ✅ MAPA
@@ -113,44 +114,58 @@ const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 
 // ✅ FETCH CSV
-fetch('dados_profissional_mapa.csv')
-.then(res => res.text())
-.then(text => {
+fetch('dados_mapa.xlsx')
+  .then(res => res.arrayBuffer())
+  .then(data => {
 
-const linhas = text.split(/\r?\n/);
+    const workbook = XLSX.read(data, { type: 'array' });
 
-linhas.slice(1).forEach(l => {
+    // pegar primeira aba
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-if (!l.trim()) return;
+    // converter para JSON
+    const json = XLSX.utils.sheet_to_json(sheet);
 
-const c = l.split(';');
+    const unicos = new Set();
 
-const nome = c[0]?.replace(/"/g,'').trim();
-const lat = parseFloat(c[1]);
-const lng = parseFloat(c[2]);
-const tipo = c[3]?.trim();
+    json.forEach(linha => {
 
-if (!nome || isNaN(lat) || isNaN(lng)) return;
+      let nome = (linha.nome || "")
+        .toString()
+        .replace(/\n/g, ' ')
+        .trim();
 
-let icone, grupo;
+      let lat = parseFloat(linha.lat);
+      let lng = parseFloat(linha.lng);
+      let tipo = (linha.tipo || "").toString().trim().toLowerCase();
 
-if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
-else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
-else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
-else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
-else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
-else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
+      if (!nome || isNaN(lat) || isNaN(lng)) return;
 
-if (grupo) {
-L.marker([lat, lng], { icon: icone })
-.bindPopup(nome)
-.addTo(grupo);
-}
+      const chave = nome + lat + lng + tipo;
+      if (unicos.has(chave)) return;
+      unicos.add(chave);
 
-});
+      let icone, grupo;
 
-atualizarDashboard();
-});
+      if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
+      else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
+      else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
+      else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
+      else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
+      else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
+
+      if (grupo) {
+        L.marker([lat, lng], { icon: icone })
+          .bindPopup(nome)
+          .addTo(grupo);
+      }
+
+    });
+
+    atualizarDashboard();
+
+  });
+
 
 // ✅ CONTROLE
 L.control.layers(null, {
