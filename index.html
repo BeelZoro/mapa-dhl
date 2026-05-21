@@ -121,43 +121,58 @@ const grupoRoxo = L.layerGroup();
 
 fetch('dados_mapa.csv')
   .then(response => response.text())
-  .then(csv => {
+  .then(text => {
 
-    const linhas = csv.split('\n').slice(1);
+    // ✅ separar linhas corretamente (respeitando aspas)
+    const linhas = text.match(/(".*?"|[^",\s]+)(?=\s*,|\n|$)/g);
 
-    linhas.forEach(linha => {
-      if (!linha.trim()) return;
+    let dados = [];
+    for (let i = 0; i < linhas.length; i += 4) {
+      dados.push({
+        nome: linhas[i]?.replace(/"/g, ''),
+        lat: parseFloat(linhas[i + 1]),
+        lng: parseFloat(linhas[i + 2]),
+        tipo: linhas[i + 3]
+      });
+    }
 
-      const colunas = linha.split(',');
+    dados.forEach(d => {
 
-      const nome = colunas[0].replace(/"/g, '');
-      const lat = parseFloat(colunas[1]);
-      const lng = parseFloat(colunas[2]);
-      const tipo = colunas[3]?.trim();
+      if (!d.lat || !d.lng) return;
 
-      let icone;
-      let grupo;
+      let icone, grupo;
 
-      // ✅ definir grupo e cor
-      if (tipo === "azul") {
+      if (d.tipo === "azul") {
         icone = iconeAzul;
         grupo = grupoAzul;
-      } else if (tipo === "verde") {
+      } else if (d.tipo === "verde") {
         icone = iconeVerde;
         grupo = grupoVerde;
-      } else if (tipo === "amarelo") {
+      } else if (d.tipo === "amarelo") {
         icone = iconeAmarelo;
         grupo = grupoAmarelo;
-      } else if (tipo === "vermelho") {
+      } else if (d.tipo === "vermelho") {
         icone = iconeVermelho;
         grupo = grupoVermelho;
-      } else if (tipo === "laranja") {
+      } else if (d.tipo === "laranja") {
         icone = iconeLaranja;
         grupo = grupoLaranja;
-      } else if (tipo === "roxo") {
+      } else if (d.tipo === "roxo") {
         icone = iconeRoxo;
         grupo = grupoRoxo;
       }
+
+      if (grupo) {
+        L.marker([d.lat, d.lng], { icon: icone })
+          .bindPopup(d.nome)
+          .addTo(grupo);
+      }
+
+    });
+
+    atualizarDashboard();
+  });
+
 
       // ✅ criar marker
       if (lat && lng && grupo) {
