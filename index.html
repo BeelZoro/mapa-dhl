@@ -130,6 +130,18 @@ font-family: Arial;
 
 <div id="map"></div>
 
+<div style="
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 2000;
+">
+  <input type="file" id="uploadExcel" accept=".xlsx"><br><br>
+  <button onclick="enviarParaGitHub()">⬆️ Enviar</button>
+
 <div class="painel-upload">
   <input type="file" id="uploadExcel" accept=".xlsx" class="input-file">
   <button class="botao botao-principal" onclick="enviarParaGitHub()">
@@ -145,7 +157,7 @@ font-family: Arial;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-   
+
 <script>
 
 // ✅ MAPA
@@ -157,8 +169,8 @@ L.Control.geocoder().addTo(map);
 // ✅ ÍCONES
 function criarIcone(cor) {
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">
-   <path fill="${cor}" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>
- </svg>`;
+  <path fill="${cor}" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>
+</svg>`;
 
 return new L.Icon({
 iconUrl: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
@@ -185,125 +197,128 @@ const grupoRoxo = L.layerGroup().addTo(map);
 
 // ✅ FETCH CSV
 fetch('dados_mapa.xlsx?v=' + Date.now())
-  .then(res => res.arrayBuffer())
-  .then(data => {
-    // seu código XLSX
-  });
+.then(res => res.arrayBuffer())
+.then(data => {
+// seu código XLSX
+});
 
 
-    const workbook = XLSX.read(data, { type: 'array' });
+const workbook = XLSX.read(data, { type: 'array' });
 
-    // pegar primeira aba
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+// pegar primeira aba
+const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-    // converter para JSON
-    const json = XLSX.utils.sheet_to_json(sheet);
+// converter para JSON
+const json = XLSX.utils.sheet_to_json(sheet);
 
-    const unicos = new Set();
+const unicos = new Set();
 
-    json.forEach(linha => {
+json.forEach(linha => {
 
-      let nome = (linha.nome || "")
-        .toString()
-        .replace(/\n/g, ' ')
-        .trim();
+let nome = (linha.nome || "")
+.toString()
+.replace(/\n/g, ' ')
+.trim();
 
-      let lat = parseFloat(linha.lat);
-      let lng = parseFloat(linha.lng);
-      let tipo = (linha.tipo || "").toString().trim().toLowerCase();
+let lat = parseFloat(linha.lat);
+let lng = parseFloat(linha.lng);
+let tipo = (linha.tipo || "").toString().trim().toLowerCase();
 
-      if (!nome || isNaN(lat) || isNaN(lng)) return;
+if (!nome || isNaN(lat) || isNaN(lng)) return;
 
-      const chave = nome + lat + lng + tipo;
-      if (unicos.has(chave)) return;
-      unicos.add(chave);
+const chave = nome + lat + lng + tipo;
+if (unicos.has(chave)) return;
+unicos.add(chave);
 
-      let icone, grupo;
+let icone, grupo;
 
-      if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
-      else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
-      else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
-      else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
-      else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
-      else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
+if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
+else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
+else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
+else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
+else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
+else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
 
-      if (grupo) {
-        L.marker([lat, lng], { icon: icone })
-          .bindPopup(nome)
-          .addTo(grupo);
-      }
+if (grupo) {
+L.marker([lat, lng], { icon: icone })
+.bindPopup(nome)
+.addTo(grupo);
+}
 
-    });
+});
 
-    atualizarDashboard();
+atualizarDashboard();
 
-  });
+});
 
 
 async function enviarParaGitHub() {
 
-  const file = document.getElementById('uploadExcel').files[0];
+const file = document.getElementById('uploadExcel').files[0];
 
-  if (!file) {
-    alert("Selecione um arquivo!");
-    return;
-  }
+if (!file) {
+alert("Selecione um arquivo!");
+return;
+}
 
-  const token = prompt("Cole seu token do GitHub:");
+const token = prompt("Cole seu token do GitHub:");
 
-  if (!token) {
-    alert("Token é obrigatório!");
-    return;
-  }
+if (!token) {
+alert("Token é obrigatório!");
+return;
+}
 
-  const base64 = await new Promise(resolve => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.readAsDataURL(file);
-  });
+const base64 = await new Promise(resolve => {
+const reader = new FileReader();
+reader.onload = () => resolve(reader.result.split(',')[1]);
+reader.readAsDataURL(file);
+});
 
-  let sha = null;
+let sha = null;
 
-  const getFile = await fetch(
-    "https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx?ref=main",
-    {
-      headers: {
-        "Authorization": "token " + token
-      }
-    }
-  );
+const getFile = await fetch(
+"https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx?ref=main",
+{
+headers: {
+"Authorization": "token " + token
+}
+}
+);
 
-  if (getFile.ok) {
-    const data = await getFile.json();
-    sha = data.sha;
-  }
+if (getFile.ok) {
+const data = await getFile.json();
+sha = data.sha;
+}
 
-  const upload = await fetch(
-    "https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx",
-    {
-      method: "PUT",
-      headers: {
-        "Authorization": "token " + token,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: "Atualização via site",
-        content: base64,
-        sha: sha,
-        branch: "main"
-      })
-    }
-  );
+const upload = await fetch(
+"https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx",
+{
+method: "PUT",
+headers: {
+"Authorization": "token " + token,
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+message: "Atualização via site",
+content: base64,
+sha: sha,
+branch: "main"
+})
+}
+);
 
-  const result = await upload.json();
+const result = await upload.json();
 
-  if (upload.ok) {
-    alert("✅ Upload realizado com sucesso!");
-    location.reload();
-  } else {
-    console.error(result);
-    alert("Erro: " + (result.message || "ver console"));
-  }
+if (upload.ok) {
+alert("✅ Upload realizado com sucesso!");
+location.reload();
+} else {
+console.error(result);
+alert("Erro: " + (result.message || "ver console"));
+}
+
+}
+
 
 // ✅ CONTROLE
 L.control.layers(null, {
