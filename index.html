@@ -130,7 +130,6 @@ font-family: Arial;
 
 <div id="map"></div>
 
-
 <div class="painel-upload">
   <input type="file" id="uploadExcel" accept=".xlsx" class="input-file">
   <button class="botao botao-principal" onclick="enviarParaGitHub()">
@@ -305,9 +304,6 @@ async function enviarParaGitHub() {
     console.error(result);
     alert("Erro: " + (result.message || "ver console"));
   }
-
-}
-
 
 // ✅ CONTROLE
 L.control.layers(null, {
