@@ -177,6 +177,7 @@ const iconeVerde = criarIcone("#00C853");
 const iconeAmarelo = criarIcone("#FFD600");
 const iconeLaranja = criarIcone("#FF6D00");
 const iconeRoxo = criarIcone("#6A1B9A");
+const iconeRosa = criarIcone("#FF1493");  
 
 // ✅ GRUPOS
 const grupoAzul = L.layerGroup().addTo(map);
@@ -185,7 +186,8 @@ const grupoVerde = L.layerGroup().addTo(map);
 const grupoAmarelo = L.layerGroup().addTo(map);
 const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
-
+const grupoRosa = L.layerGroup().addTo(map);
+  
 // ✅ FETCH CSV
 
 fetch('dados_mapa.xlsx?v=' + Date.now())
@@ -225,7 +227,8 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
       else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
       else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
-
+      else if (tipo === "rosa") { grupo = grupoRosa; icone = iconeRosa; }
+      
       if (grupo) {
         L.marker([lat, lng], { icon: icone })
           .bindPopup(nome)
@@ -314,7 +317,8 @@ L.control.layers(null, {
 "🟢 Lojas": grupoVerde,
 "🟡 Honda": grupoAmarelo,
 "🟠 BYD": grupoLaranja,
-"🟣 Stellantis": grupoRoxo
+"🟣 Stellantis": grupoRoxo,
+"🧬 Life Science": grupoRosa
 }, {collapsed:false}).addTo(map);
 
 // ✅ CHECKBOX
@@ -326,6 +330,7 @@ grupoVermelho.addTo(map);
 grupoAmarelo.addTo(map);
 grupoLaranja.addTo(map);
 grupoRoxo.addTo(map);
+grupoRosa.addTo(map);  
 }
 }
 
@@ -337,6 +342,7 @@ map.removeLayer(grupoVermelho);
 map.removeLayer(grupoAmarelo);
 map.removeLayer(grupoLaranja);
 map.removeLayer(grupoRoxo);
+map.removeLayer(grupoRosa);
 }
 }
 
@@ -348,6 +354,7 @@ document.getElementById("qtdVerde").innerText = grupoVerde.getLayers().length;
 document.getElementById("qtdAmarelo").innerText = grupoAmarelo.getLayers().length;
 document.getElementById("qtdLaranja").innerText = grupoLaranja.getLayers().length;
 document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
+document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
 }
 
 </script>
