@@ -188,7 +188,6 @@ async function enviarParaGitHub() {
     return;
   }
 
-  // 🔒 token digitado na hora (não fica salvo)
   const token = prompt("Cole seu token do GitHub:");
 
   if (!token) {
@@ -196,7 +195,6 @@ async function enviarParaGitHub() {
     return;
   }
 
-  // converter para base64
   const base64 = await new Promise(resolve => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result.split(',')[1]);
@@ -205,7 +203,6 @@ async function enviarParaGitHub() {
 
   let sha = null;
 
-  // ✅ buscar SHA corretamente
   const getFile = await fetch(
     "https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx?ref=main",
     {
@@ -218,11 +215,8 @@ async function enviarParaGitHub() {
   if (getFile.ok) {
     const data = await getFile.json();
     sha = data.sha;
-  } else {
-    console.log("Arquivo não existe ainda, será criado");
   }
 
-  // ✅ enviar arquivo
   const upload = await fetch(
     "https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx",
     {
@@ -232,7 +226,7 @@ async function enviarParaGitHub() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        message: "Atualização via sistema web",
+        message: "Atualização via site",
         content: base64,
         sha: sha,
         branch: "main"
@@ -252,41 +246,6 @@ async function enviarParaGitHub() {
 
 }
 
-  if (getFile.ok) {
-    const json = await getFile.json();
-    sha = json.sha;
-  } else {
-    console.warn("Arquivo não encontrado, criando novo...");
-  }
-
-  // ✅ ENVIAR
-  const response = await fetch(
-    "https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx",
-    {
-      method: "PUT",
-      headers: {
-        "Authorization": "token " + token,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        message: "Atualização automática do mapa",
-        content: base64,
-        sha: sha,
-        branch: "main"   // ✅ ESSENCIAL
-      })
-    }
-  );
-
-  const result = await response.json();
-
-  if (response.ok) {
-    alert("✅ Upload realizado com sucesso!");
-    location.reload();
-  } else {
-    console.error(result);
-    alert("Erro no upload: " + (result.message || "ver console"));
-  }
-}
 
 
 // ✅ CONTROLE
