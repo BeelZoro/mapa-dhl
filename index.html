@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -6,14 +5,12 @@
 <title>Mapa DHL</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
 
 <style>
 html, body { height: 100%; margin: 0; }
 
-/* topo */
 #topbar {
   position: fixed;
   top: 0;
@@ -26,13 +23,11 @@ html, body { height: 100%; margin: 0; }
   z-index: 2000;
 }
 
-/* mapa */
 #map {
   height: calc(100% - 60px);
   margin-top: 60px;
 }
 
-/* dashboard */
 #dashboard {
   position: fixed;
   left: 10px;
@@ -56,12 +51,12 @@ html, body { height: 100%; margin: 0; }
   <h3>📊 Resumo</h3>
 
   <label>
-    <input type="checkbox" id="checkTodos" onchange="selecionarTodos(this.checked)">
+    <input type="checkbox" onchange="selecionarTodos(this.checked)">
     ✅ Selecionar Todos
   </label><br>
 
   <label>
-    <input type="checkbox" id="checkNenhum" onchange="removerTodos(this.checked)">
+    <input type="checkbox" onchange="removerTodos(this.checked)">
     ❌ Remover Todos
   </label>
 
@@ -77,7 +72,6 @@ html, body { height: 100%; margin: 0; }
 
 <div id="map"></div>
 
-<!-- JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
@@ -89,7 +83,7 @@ const map = L.map('map').setView([-23.4543, -46.5337], 11);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 L.Control.geocoder().addTo(map);
 
-// ✅ FUNÇÃO ÍCONE
+// ✅ ÍCONES
 function criarIcone(cor) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">
     <path fill="${cor}" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>
@@ -111,15 +105,16 @@ const iconeLaranja = criarIcone("#FF6D00");
 const iconeRoxo = criarIcone("#6A1B9A");
 
 // ✅ GRUPOS
-const grupoAzul = L.layerGroup();
-const grupoVermelho = L.layerGroup();
-const grupoVerde = L.layerGroup();
-const grupoAmarelo = L.layerGroup();
-const grupoLaranja = L.layerGroup();
-const grupoRoxo = L.layerGroup();
+const grupoAzul = L.layerGroup().addTo(map);
+const grupoVermelho = L.layerGroup().addTo(map);
+const grupoVerde = L.layerGroup().addTo(map);
+const grupoAmarelo = L.layerGroup().addTo(map);
+const grupoLaranja = L.layerGroup().addTo(map);
+const grupoRoxo = L.layerGroup().addTo(map);
 
+// ✅ FETCH CSV
 fetch('dados_mapa.csv')
-  .then(response => response.text())
+  .then(res => res.text())
   .then(csv => {
 
     const linhas = csv.split('\n').slice(1);
@@ -128,34 +123,21 @@ fetch('dados_mapa.csv')
 
       if (!linha.trim()) return;
 
-      const colunas = linha.split(',');
+      const c = linha.split(',');
 
-      const nome = colunas[0].replace(/"/g, '');
-      const lat = parseFloat(colunas[1]);
-      const lng = parseFloat(colunas[2]);
-      const tipo = colunas[3]?.trim();
+      const nome = c[0]?.replace(/"/g, '');
+      const lat = parseFloat(c[1]);
+      const lng = parseFloat(c[2]);
+      const tipo = c[3]?.trim();
 
       let icone, grupo;
 
-      if (tipo === "azul") {
-        icone = iconeAzul;
-        grupo = grupoAzul;
-      } else if (tipo === "verde") {
-        icone = iconeVerde;
-        grupo = grupoVerde;
-      } else if (tipo === "amarelo") {
-        icone = iconeAmarelo;
-        grupo = grupoAmarelo;
-      } else if (tipo === "vermelho") {
-        icone = iconeVermelho;
-        grupo = grupoVermelho;
-      } else if (tipo === "laranja") {
-        icone = iconeLaranja;
-        grupo = grupoLaranja;
-      } else if (tipo === "roxo") {
-        icone = iconeRoxo;
-        grupo = grupoRoxo;
-      }
+      if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
+      else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
+      else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
+      else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
+      else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
+      else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
 
       if (!isNaN(lat) && !isNaN(lng) && grupo) {
         L.marker([lat, lng], { icon: icone })
@@ -169,15 +151,7 @@ fetch('dados_mapa.csv')
 
   });
 
-// ✅ ADICIONAR AO MAPA
-grupoAzul.addTo(map);
-grupoVermelho.addTo(map);
-grupoVerde.addTo(map);
-grupoAmarelo.addTo(map);
-grupoLaranja.addTo(map);
-grupoRoxo.addTo(map);
-
-// ✅ CONTROLE LATERAL
+// ✅ CONTROLE
 L.control.layers(null, {
   "🔵 Shoppings": grupoAzul,
   "🔴 SPG": grupoVermelho,
@@ -187,30 +161,26 @@ L.control.layers(null, {
   "🟣 Stellantis": grupoRoxo
 }, {collapsed:false}).addTo(map);
 
-// ✅ CHECKBOX GLOBAL
+// ✅ CHECKBOX
 function selecionarTodos(ativo) {
   if (ativo) {
     grupoAzul.addTo(map);
-    grupoVermelho.addTo(map);
     grupoVerde.addTo(map);
+    grupoVermelho.addTo(map);
     grupoAmarelo.addTo(map);
     grupoLaranja.addTo(map);
     grupoRoxo.addTo(map);
-
-    document.getElementById("checkNenhum").checked = false;
   }
 }
 
 function removerTodos(ativo) {
   if (ativo) {
     map.removeLayer(grupoAzul);
-    map.removeLayer(grupoVermelho);
     map.removeLayer(grupoVerde);
+    map.removeLayer(grupoVermelho);
     map.removeLayer(grupoAmarelo);
     map.removeLayer(grupoLaranja);
     map.removeLayer(grupoRoxo);
-
-    document.getElementById("checkTodos").checked = false;
   }
 }
 
@@ -224,51 +194,7 @@ function atualizarDashboard() {
   document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
 }
 
-atualizarDashboard();
-  
-// EXPORT EXCEL
-
-function exportarParaExcel() {
-  const dados = [];
-
-  function extrairGrupo(grupo, tipo) {
-    grupo.eachLayer(layer => {
-      const nome = layer.getPopup()?.getContent() || "";
-      const latlng = layer.getLatLng();
-
-      dados.push({
-        nome: nome,
-        lat: latlng.lat,
-        lng: latlng.lng,
-        tipo: tipo
-      });
-    });
-  }
-
-  extrairGrupo(grupoAzul, "azul");
-  extrairGrupo(grupoVerde, "verde");
-  extrairGrupo(grupoAmarelo, "amarelo");
-  extrairGrupo(grupoVermelho, "vermelho");
-  extrairGrupo(grupoLaranja, "laranja");
-  extrairGrupo(grupoRoxo, "roxo");
-
-  console.table(dados);
-
-  let csv = "nome,lat,lng,tipo\n";
-  dados.forEach(row => {
-    csv += `"${row.nome}",${row.lat},${row.lng},${row.tipo}\n`;
-  });
-
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement("a");
-
-  link.href = URL.createObjectURL(blob);
-  link.download = "dados_mapa.csv";
-  link.click();
-}
-``
 </script>
 
 </body>
 </html>
-
