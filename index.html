@@ -183,32 +183,41 @@ async function enviarParaGitHub() {
 
   const input = document.getElementById('uploadExcel');
   const file = input.files[0];
+
+  if (!file) {
+    alert("Selecione um arquivo!");
+    return;
+  }
+
   const token = "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";
 
-  if (!file) return alert("Selecione um arquivo!");
-
+  // converter para base64
   const base64 = await new Promise(resolve => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result.split(',')[1]);
     reader.readAsDataURL(file);
   });
 
-  // buscar SHA do arquivo existente
   let sha = null;
 
+  // ✅ IMPORTANTE: buscar SHA com branch correta
   const getFile = await fetch(
-    "https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx",
+    "https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx?ref=main",
     {
-      headers: { "Authorization": "token " + token }
+      headers: {
+        "Authorization": "token " + token
+      }
     }
   );
 
   if (getFile.ok) {
     const json = await getFile.json();
     sha = json.sha;
+  } else {
+    console.warn("Arquivo não encontrado, criando novo...");
   }
 
-  // enviar atualização
+  // ✅ ENVIAR
   const response = await fetch(
     "https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx",
     {
@@ -218,21 +227,25 @@ async function enviarParaGitHub() {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        message: "Atualizando Excel do mapa",
+        message: "Atualização automática do mapa",
         content: base64,
-        sha: sha // inclui se existir
+        sha: sha,
+        branch: "main"   // ✅ ESSENCIAL
       })
     }
   );
 
+  const result = await response.json();
+
   if (response.ok) {
-    alert("✅ Upload realizado!");
+    alert("✅ Upload realizado com sucesso!");
     location.reload();
   } else {
-    console.error(await response.json());
-    alert("Erro no upload");
+    console.error(result);
+    alert("Erro no upload: " + (result.message || "ver console"));
   }
 }
+
 
 // ✅ CONTROLE
 L.control.layers(null, {
