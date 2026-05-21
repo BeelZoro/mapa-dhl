@@ -130,28 +130,19 @@ font-family: Arial;
 
 <div id="map"></div>
 
-<div style="
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  background: white;
-  padding: 10px;
-  border-radius: 8px;
-  z-index: 2000;
-">
-  <input type="file" id="uploadExcel" accept=".xlsx"><br><br>
-  <button onclick="enviarParaGitHub()">⬆️ Enviar</button>
 
 <div class="painel-upload">
   <input type="file" id="uploadExcel" accept=".xlsx" class="input-file">
+
   <button class="botao botao-principal" onclick="enviarParaGitHub()">
     🚀 Atualizar Mapa
   </button>
+
   <button class="botao botao-secundario" onclick="location.reload()">
     🔄 Recarregar
   </button>
-
 </div>
+
 
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -196,61 +187,57 @@ const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 
 // ✅ FETCH CSV
+
+
 fetch('dados_mapa.xlsx?v=' + Date.now())
-.then(res => res.arrayBuffer())
-.then(data => {
-// seu código XLSX
-});
+  .then(res => res.arrayBuffer())
+  .then(data => {
 
+    const workbook = XLSX.read(data, { type: 'array' });
 
-const workbook = XLSX.read(data, { type: 'array' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
-// pegar primeira aba
-const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet);
 
-// converter para JSON
-const json = XLSX.utils.sheet_to_json(sheet);
+    const unicos = new Set();
 
-const unicos = new Set();
+    json.forEach(linha => {
 
-json.forEach(linha => {
+      let nome = (linha.nome || "")
+        .toString()
+        .replace(/\n/g, ' ')
+        .trim();
 
-let nome = (linha.nome || "")
-.toString()
-.replace(/\n/g, ' ')
-.trim();
+      let lat = parseFloat(linha.lat);
+      let lng = parseFloat(linha.lng);
+      let tipo = (linha.tipo || "").toLowerCase();
 
-let lat = parseFloat(linha.lat);
-let lng = parseFloat(linha.lng);
-let tipo = (linha.tipo || "").toString().trim().toLowerCase();
+      if (!nome || isNaN(lat) || isNaN(lng)) return;
 
-if (!nome || isNaN(lat) || isNaN(lng)) return;
+      const chave = nome + lat + lng + tipo;
+      if (unicos.has(chave)) return;
+      unicos.add(chave);
 
-const chave = nome + lat + lng + tipo;
-if (unicos.has(chave)) return;
-unicos.add(chave);
+      let icone, grupo;
 
-let icone, grupo;
+      if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
+      else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
+      else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
+      else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
+      else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
+      else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
 
-if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
-else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
-else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
-else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
-else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
-else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
+      if (grupo) {
+        L.marker([lat, lng], { icon: icone })
+          .bindPopup(nome)
+          .addTo(grupo);
+      }
 
-if (grupo) {
-L.marker([lat, lng], { icon: icone })
-.bindPopup(nome)
-.addTo(grupo);
-}
+    });
 
-});
+    atualizarDashboard();
 
-atualizarDashboard();
-
-});
-
+  });
 
 async function enviarParaGitHub() {
 
