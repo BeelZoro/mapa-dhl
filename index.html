@@ -49,13 +49,6 @@ font-family: Arial;
 
 <div id="dashboard">
 <h3>📊 Resumo</h3>
-
-<div style="margin-top:10px;">
-  <input type="file" id="uploadExcel" accept=".xlsx">
-  <br><br>
-  <button onclick="enviarParaGitHub()">⬆️ Enviar para GitHub</button>
-</div>
-
 <label>
 <input type="checkbox" onchange="selecionarTodos(this.checked)">
 ✅ Selecionar Todos
@@ -77,6 +70,19 @@ font-family: Arial;
 </div>
 
 <div id="map"></div>
+
+<div style="
+  position: fixed;
+  top: 80px;
+  right: 10px;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 2000;
+">
+  <input type="file" id="uploadExcel" accept=".xlsx"><br><br>
+  <button onclick="enviarParaGitHub()">⬆️ Enviar</button>
+</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
