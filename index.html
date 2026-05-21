@@ -38,65 +38,6 @@ border-radius: 8px;
 z-index: 1500;
 font-family: Arial;
 }
-
-
-/* CONTAINER FIXO */
-.painel-upload {
-  position: fixed;
-  bottom: 0px;
-  right: 0px;
-  z-index: 9999;
-
-  background: white;
-  padding: 15px;
-  border-radius: 12px 0 0 0;
-
-  box-shadow: -2px -2px 12px rgba(0,0,0,0.15);
-}
-
-/* BOTÕES */
-.botao {
-  display: block;
-  width: 100%;
-  margin-top: 8px;
-
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-
-  transition: all 0.2s ease-in-out;
-}
-
-/* BOTÃO PRINCIPAL */
-.botao-principal {
-  background: linear-gradient(135deg, #ffcc00, #ff9900);
-  color: #000;
-}
-
-.botao-principal:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-/* BOTÃO SECUNDÁRIO */
-.botao-secundario {
-  background: #f5f5f5;
-  color: #333;
-}
-
-.botao-secundario:hover {
-  background: #e0e0e0;
-}
-
-/* INPUT */
-.input-file {
-  font-size: 13px;
-}
-  
 </style>
 </head>
 
@@ -130,20 +71,18 @@ font-family: Arial;
 
 <div id="map"></div>
 
-
-<div class="painel-upload">
-  <input type="file" id="uploadExcel" accept=".xlsx" class="input-file">
-
-  <button class="botao botao-principal" onclick="enviarParaGitHub()">
-    🚀 Atualizar Mapa
-  </button>
-
-  <button class="botao botao-secundario" onclick="location.reload()">
-    🔄 Recarregar
-  </button>
+<div style="
+ position: fixed;
+ bottom: 10px;
+ right: 10px;
+ background: white;
+ padding: 10px;
+ border-radius: 8px;
+ z-index: 2000;
+">
+<input type="file" id="uploadExcel" accept=".xlsx"><br><br>
+<button onclick="enviarParaGitHub()">⬆️ Enviar</button>
 </div>
-
-
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
@@ -187,170 +126,12 @@ const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 
 // ✅ FETCH CSV
-
-
+fetch('dados_mapa.xlsx')
 fetch('dados_mapa.xlsx?v=' + Date.now())
-  .then(res => res.arrayBuffer())
-  .then(data => {
-
-    const workbook = XLSX.read(data, { type: 'array' });
-
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-
-    const json = XLSX.utils.sheet_to_json(sheet);
-
-    const unicos = new Set();
-
-    json.forEach(linha => {
-
-      let nome = (linha.nome || "")
-        .toString()
-        .replace(/\n/g, ' ')
-        .trim();
-
-      let lat = parseFloat(linha.lat);
-      let lng = parseFloat(linha.lng);
-      let tipo = (linha.tipo || "").toLowerCase();
-
-      if (!nome || isNaN(lat) || isNaN(lng)) return;
-
-      const chave = nome + lat + lng + tipo;
-      if (unicos.has(chave)) return;
-      unicos.add(chave);
-
-      let icone, grupo;
-
-      if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
-      else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
-      else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
-      else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
-      else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
-      else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
-
-      if (grupo) {
-        L.marker([lat, lng], { icon: icone })
-          .bindPopup(nome)
-          .addTo(grupo);
-      }
-
-    });
-
-    atualizarDashboard();
-
+.then(res => res.arrayBuffer())
+.then(data => {
+    // seu código XLSX
   });
 
-async function enviarParaGitHub() {
 
-const file = document.getElementById('uploadExcel').files[0];
-
-if (!file) {
-alert("Selecione um arquivo!");
-return;
-}
-
-const token = prompt("Cole seu token do GitHub:");
-
-if (!token) {
-alert("Token é obrigatório!");
-return;
-}
-
-const base64 = await new Promise(resolve => {
-const reader = new FileReader();
-reader.onload = () => resolve(reader.result.split(',')[1]);
-reader.readAsDataURL(file);
-});
-
-let sha = null;
-
-const getFile = await fetch(
-"https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx?ref=main",
-{
-headers: {
-"Authorization": "token " + token
-}
-}
-);
-
-if (getFile.ok) {
-const data = await getFile.json();
-sha = data.sha;
-}
-
-const upload = await fetch(
-"https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx",
-{
-method: "PUT",
-headers: {
-"Authorization": "token " + token,
-"Content-Type": "application/json"
-},
-body: JSON.stringify({
-message: "Atualização via site",
-content: base64,
-sha: sha,
-branch: "main"
-})
-}
-);
-
-const result = await upload.json();
-
-if (upload.ok) {
-alert("✅ Upload realizado com sucesso!");
-location.reload();
-} else {
-console.error(result);
-alert("Erro: " + (result.message || "ver console"));
-}
-
-}
-
-
-// ✅ CONTROLE
-L.control.layers(null, {
-"🔵 Shoppings": grupoAzul,
-"🔴 SPG": grupoVermelho,
-"🟢 Lojas": grupoVerde,
-"🟡 Honda": grupoAmarelo,
-"🟠 BYD": grupoLaranja,
-"🟣 Stellantis": grupoRoxo
-}, {collapsed:false}).addTo(map);
-
-// ✅ CHECKBOX
-function selecionarTodos(ativo) {
-if (ativo) {
-grupoAzul.addTo(map);
-grupoVerde.addTo(map);
-grupoVermelho.addTo(map);
-grupoAmarelo.addTo(map);
-grupoLaranja.addTo(map);
-grupoRoxo.addTo(map);
-}
-}
-
-function removerTodos(ativo) {
-if (ativo) {
-map.removeLayer(grupoAzul);
-map.removeLayer(grupoVerde);
-map.removeLayer(grupoVermelho);
-map.removeLayer(grupoAmarelo);
-map.removeLayer(grupoLaranja);
-map.removeLayer(grupoRoxo);
-}
-}
-
-// ✅ DASHBOARD
-function atualizarDashboard() {
-document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
-document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
-document.getElementById("qtdVerde").innerText = grupoVerde.getLayers().length;
-document.getElementById("qtdAmarelo").innerText = grupoAmarelo.getLayers().length;
-document.getElementById("qtdLaranja").innerText = grupoLaranja.getLayers().length;
-document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
-}
-
-</script>
-
-</body>
-</html>
+const workbook = XLSX.read(data, { type: 'array' });
