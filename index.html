@@ -114,32 +114,25 @@ const grupoRoxo = L.layerGroup().addTo(map);
 
 // ✅ FETCH CSV
 
+
 fetch('dados_mapa_limpo.csv')
 .then(res => res.text())
 .then(text => {
 
-  const linhas = text.split('\n').slice(1);
-  const unicos = new Set();
+  const linhas = text.split(/\r?\n/);
 
-  linhas.forEach(l => {
+  linhas.slice(1).forEach(l => {
 
     if (!l.trim()) return;
 
-    let c = l.split(',');
+    const c = l.split(',');
 
-    let nome = c[0]
-      .replace(/"/g, '')
-      .replace(/\\n/g, ' ')
-      .replace(/\\/g, '')
-      .trim();
-
+    const nome = c[0]?.replace(/"/g,'').trim();
     const lat = parseFloat(c[1]);
     const lng = parseFloat(c[2]);
     const tipo = c[3]?.trim();
 
-    const chave = nome + lat + lng + tipo;
-    if (unicos.has(chave)) return;
-    unicos.add(chave);
+    if (!nome || isNaN(lat) || isNaN(lng)) return;
 
     let icone, grupo;
 
@@ -150,7 +143,7 @@ fetch('dados_mapa_limpo.csv')
     else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
     else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
 
-    if (!isNaN(lat) && !isNaN(lng) && grupo) {
+    if (grupo) {
       L.marker([lat, lng], { icon: icone })
         .bindPopup(nome)
         .addTo(grupo);
@@ -160,6 +153,7 @@ fetch('dados_mapa_limpo.csv')
 
   atualizarDashboard();
 });
+
 
 // ✅ CONTROLE
 L.control.layers(null, {
