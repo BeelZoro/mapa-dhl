@@ -403,20 +403,25 @@ document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
 document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
 }
 
+
 let dashboardAberto = false;
 
 function toggleDashboard() {
 
   const dash = document.getElementById("dashboard");
+  const btn = document.getElementById("btnDashboard");
 
   if (dashboardAberto) {
-    dash.style.left = "-260px"; // esconde
+    dash.style.left = "-260px";
+    btn.innerText = "📊"; // fechado
   } else {
-    dash.style.left = "10px"; // mostra
+    dash.style.left = "10px";
+    btn.innerText = "❌"; // aberto
   }
 
   dashboardAberto = !dashboardAberto;
 }
+
  
 </script>
 
