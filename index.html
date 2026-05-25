@@ -108,6 +108,7 @@ margin-top: 60px;
   left: 10px;
 
   z-index: 99999; /* maior que tudo */
+  background: #ffcc00;
   color: white;
 
   border-radius: 50%;
@@ -411,6 +412,21 @@ function toggleDashboard() {
 
   dashboardAberto = !dashboardAberto;
 }
+
+document.addEventListener("click", function(event) {
+
+  const dash = document.getElementById("dashboard");
+  const btn = document.getElementById("btnDashboard");
+
+  const clicouDentroDoDashboard = dash.contains(event.target);
+  const clicouNoBotao = btn.contains(event.target);
+
+  if (!clicouDentroDoDashboard && !clicouNoBotao && dashboardAberto) {
+    dash.style.left = "-260px";
+    btn.innerText = "📊"; // volta ícone
+    dashboardAberto = false;
+  }
+
 
  </script>
 
