@@ -191,7 +191,13 @@ margin-top: 60px;
 <script>
 
 // ✅ MAPA
-const map = L.map('map').setView([-23.4543, -46.5337], 11);
+const map = L.map('map', {
+  zoomControl: false // remove zoom padrão
+}).setView([-23.4543, -46.5337], 11);
+  
+L.control.zoom({
+  position: 'bottomleft'
+}).addTo(map);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 L.Control.geocoder().addTo(map);
