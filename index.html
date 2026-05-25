@@ -352,9 +352,8 @@ alert("Erro: " + (result.message || "ver console"));
 
 }
 
-
 // ✅ CONTROLE
-L.control.layers(null, {
+const controleLayers = L.control.layers(null, {
 "🔵 Shoppings": grupoAzul,
 "🔴 SPG": grupoVermelho,
 "🟢 Lojas de rua": grupoVerde,
@@ -363,6 +362,30 @@ L.control.layers(null, {
 "🟣 Stellantis": grupoRoxo,
 "🧬 Life Science": grupoRosa
 }, {collapsed:false}).addTo(map);
+
+setTimeout(() => {
+
+  const container = document.querySelector('.leaflet-control-layers-list');
+
+  if (!container) return;
+
+  const div = document.createElement("div");
+
+  div.innerHTML = `
+    <label style="font-weight:bold;">
+      <input type="checkbox" id="checkTodosMapa">
+      ✅ Selecionar Todos
+    </label>
+    <hr style="margin:5px 0;">
+  `;
+
+  container.insertBefore(div, container.firstChild);
+
+  document.getElementById("checkTodosMapa").addEventListener("change", function(e) {
+    toggleTodosMapa(e.target.checked);
+  });
+
+}, 500);
 
 // ✅ CHECKBOX
 function selecionarTodos(ativo) {
@@ -415,6 +438,19 @@ function toggleDashboard() {
   dashboardAberto = !dashboardAberto;
 }
 
+function toggleTodosMapa(ativo) {
+
+  const layersControl = document.querySelectorAll(
+    '.leaflet-control-layers-overlays input[type="checkbox"]'
+  );
+
+  layersControl.forEach(input => {
+    if (input.checked !== ativo) {
+      input.click(); // 🔥 sincroniza com Leaflet
+    }
+  });
+
+}
  </script>
 
 </body>
