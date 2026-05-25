@@ -231,14 +231,13 @@ const grupoRosa = L.layerGroup().addTo(map);
   
 // ✅ FETCH CSV
 
+
 fetch('dados_mapa.xlsx?v=' + Date.now())
   .then(res => res.arrayBuffer())
   .then(data => {
 
     const workbook = XLSX.read(data, { type: 'array' });
-
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-
     const json = XLSX.utils.sheet_to_json(sheet);
 
     const unicos = new Set();
@@ -268,8 +267,7 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
       else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
       else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
-      else if (tipo === "rosa") { grupo = grupoRosa; icone = iconeRosa; }
-      
+
       if (grupo) {
         L.marker([lat, lng], { icon: icone })
           .bindPopup(nome)
@@ -405,28 +403,13 @@ function toggleDashboard() {
   const dash = document.getElementById("dashboard");
 
   if (dashboardAberto) {
-    dash.style.left = "-260px"; // some
+    dash.style.left = "-260px";
   } else {
-    dash.style.left = "70px"; // aparece SEM cobrir botão
+    dash.style.left = "70px";
   }
 
   dashboardAberto = !dashboardAberto;
 }
-
-document.addEventListener("click", function(event) {
-
-  const dash = document.getElementById("dashboard");
-  const btn = document.getElementById("btnDashboard");
-
-  const clicouDentroDoDashboard = dash.contains(event.target);
-  const clicouNoBotao = btn.contains(event.target);
-
-  if (!clicouDentroDoDashboard && !clicouNoBotao && dashboardAberto) {
-    dash.style.left = "-260px";
-    btn.innerText = "📊"; // volta ícone
-    dashboardAberto = false;
-  }
-
 
  </script>
 
