@@ -104,6 +104,7 @@ margin-top: 60px;
 
 #btnDashboard {
   position: fixed;
+  top: 100px;
   top: 80px;
   left: 10px;
 
@@ -148,21 +149,25 @@ margin-top: 60px;
 
 <div id="dashboard">
 <h3>📊 Resumo</h3>
+<label>
+<input type="checkbox" onchange="selecionarTodos(this.checked)">
+✅ Selecionar Todos
+</label><br>
 
 <label>
-  <input type="checkbox" id="checkTodos" onchange="toggleTodos(this.checked)">
-  ✅ Selecionar Todos
+<input type="checkbox" onchange="removerTodos(this.checked)">
+❌ Remover Todos
 </label>
 
 <hr>
-<label><input type="checkbox" class="checkGrupo" onchange="toggleGrupo('azul', this.checked)"> 🔵 Shoppings</label><br>
-<label><input type="checkbox" class="checkGrupo" onchange="toggleGrupo('vermelho', this.checked)"> 🔴 SPG</label><br>
-<label><input type="checkbox" class="checkGrupo" onchange="toggleGrupo('verde', this.checked)"> 🟢 Lojas</label><br>
-<label><input type="checkbox" class="checkGrupo" onchange="toggleGrupo('amarelo', this.checked)"> 🟡 Honda</label><br>
-<label><input type="checkbox" class="checkGrupo" onchange="toggleGrupo('laranja', this.checked)"> 🟠 BYD</label><br>
-<label><input type="checkbox" class="checkGrupo" onchange="toggleGrupo('roxo', this.checked)"> 🟣 Stellantis</label><br>
-<label><input type="checkbox" class="checkGrupo" onchange="toggleGrupo('rosa', this.checked)"> 🧬 Life Science</label>
 
+<p>🔵 Shoppings: <span id="qtdAzul">0</span></p>
+<p>🔴 SPG: <span id="qtdVermelho">0</span></p>
+<p>🟢 Lojas de rua: <span id="qtdVerde">0</span></p>
+<p>🟡 Honda: <span id="qtdAmarelo">0</span></p>
+<p>🟠 BYD: <span id="qtdLaranja">0</span></p>
+<p>🟣 Stellantis: <span id="qtdRoxo">0</span></p>
+<p>🧬 Life Science: <span id="qtdRosa">0</span></p>  
 </div>
 
 <div id="map"></div>
@@ -190,7 +195,7 @@ margin-top: 60px;
 const map = L.map('map', {
   zoomControl: false // remove zoom padrão
 }).setView([-23.4543, -46.5337], 11);
-  
+
 L.control.zoom({
   position: 'bottomleft'
 }).addTo(map);
@@ -228,7 +233,7 @@ const grupoAmarelo = L.layerGroup().addTo(map);
 const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 const grupoRosa = L.layerGroup().addTo(map);
-  
+
 // ✅ FETCH CSV
 fetch('dados_mapa.xlsx?v=' + Date.now())
   .then(res => res.arrayBuffer())
@@ -266,7 +271,7 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
       else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
       else if (tipo === "rosa") { grupo = grupoRosa; icone = iconeRosa; }
-      
+
       if (grupo) {
         L.marker([lat, lng], { icon: icone })
           .bindPopup(nome)
@@ -347,6 +352,7 @@ alert("Erro: " + (result.message || "ver console"));
 
 }
 
+
 // ✅ CONTROLE
 L.control.layers(null, {
 "🔵 Shoppings": grupoAzul,
@@ -359,69 +365,28 @@ L.control.layers(null, {
 }, {collapsed:false}).addTo(map);
 
 // ✅ CHECKBOX
-function toggleTodos(checked) {
-
-  const checks = document.querySelectorAll('.checkGrupo');
-
-  checks.forEach(cb => {
-    cb.checked = checked;
-  });
-
-  if (checked) {
-    grupoAzul.addTo(map);
-    grupoVermelho.addTo(map);
-    grupoVerde.addTo(map);
-    grupoAmarelo.addTo(map);
-    grupoLaranja.addTo(map);
-    grupoRoxo.addTo(map);
-    grupoRosa.addTo(map);
-  } else {
-    map.removeLayer(grupoAzul);
-    map.removeLayer(grupoVermelho);
-    map.removeLayer(grupoVerde);
-    map.removeLayer(grupoAmarelo);
-    map.removeLayer(grupoLaranja);
-    map.removeLayer(grupoRoxo);
-    map.removeLayer(grupoRosa);
-  }
+function selecionarTodos(ativo) {
+if (ativo) {
+grupoAzul.addTo(map);
+grupoVerde.addTo(map);
+grupoVermelho.addTo(map);
+grupoAmarelo.addTo(map);
+grupoLaranja.addTo(map);
+grupoRoxo.addTo(map);
+grupoRosa.addTo(map);  
+}
 }
 
-function toggleGrupo(tipo, ativo) {
-
-  let grupo;
-
-  if (tipo === "azul") grupo = grupoAzul;
-  else if (tipo === "vermelho") grupo = grupoVermelho;
-  else if (tipo === "verde") grupo = grupoVerde;
-  else if (tipo === "amarelo") grupo = grupoAmarelo;
-  else if (tipo === "laranja") grupo = grupoLaranja;
-  else if (tipo === "roxo") grupo = grupoRoxo;
-  else if (tipo === "rosa") grupo = grupoRosa;
-
-  if (!grupo) return;
-
-  if (ativo) {
-    grupo.addTo(map);
-  } else {
-    map.removeLayer(grupo);
-  }
-
-  atualizarCheckTodos();
+function removerTodos(ativo) {
+if (ativo) {
+map.removeLayer(grupoAzul);
+map.removeLayer(grupoVerde);
+map.removeLayer(grupoVermelho);
+map.removeLayer(grupoAmarelo);
+map.removeLayer(grupoLaranja);
+map.removeLayer(grupoRoxo);
+map.removeLayer(grupoRosa);
 }
-
-function atualizarCheckTodos() {
-
-  const checks = document.querySelectorAll('.checkGrupo');
-
-  let todosMarcados = true;
-
-  checks.forEach(cb => {
-    if (!cb.checked) {
-      todosMarcados = false;
-    }
-  });
-
-  document.getElementById('checkTodos').checked = todosMarcados;
 }
 
 // ✅ DASHBOARD
