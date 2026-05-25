@@ -97,6 +97,42 @@ font-family: Arial;
   font-size: 13px;
 }
 
+/* BOTÃO FLUTUANTE */
+#btnDashboard {
+  position: fixed;
+  top: 100px;
+  left: 10px;
+  z-index: 3000;
+
+  background: linear-gradient(135deg, #ffcc00, #ff9900);
+  border: none;
+  border-radius: 50%;
+
+  width: 45px;
+  height: 45px;
+
+  font-size: 20px;
+  cursor: pointer;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* DASHBOARD OCULTO */
+#dashboard {
+  position: fixed;
+  left: -260px; /* escondido */
+  top: 80px;
+
+  width: 240px;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  z-index: 2500;
+
+  transition: left 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
 </style>
 </head>
 
@@ -104,6 +140,11 @@ font-family: Arial;
 
 <div id="topbar">
 <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/DHL_Logo.svg" height="40">
+
+<button id="btnDashboard" onclick="toggleDashboard()">
+  📊
+</button>
+
 </div>
 
 <div id="dashboard">
@@ -358,6 +399,21 @@ document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
 document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
 }
 
+let dashboardAberto = false;
+
+function toggleDashboard() {
+
+  const dash = document.getElementById("dashboard");
+
+  if (dashboardAberto) {
+    dash.style.left = "-260px"; // esconde
+  } else {
+    dash.style.left = "10px"; // mostra
+  }
+
+  dashboardAberto = !dashboardAberto;
+}
+ 
 </script>
 
 </body>
