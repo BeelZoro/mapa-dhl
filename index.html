@@ -184,8 +184,6 @@ margin-top: 60px;
 
 </div>
 
-
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -265,7 +263,7 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
       else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
       else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
-      else if (tipo === "rosa") { grupo = grupoRoxo; icone = iconeRosa; }
+      else if (tipo === "rosa") { grupo = grupoRosa; icone = iconeRosa; }
       
       if (grupo) {
         L.marker([lat, lng], { icon: icone })
