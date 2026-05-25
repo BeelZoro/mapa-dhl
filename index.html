@@ -101,12 +101,11 @@ margin-top: 60px;
 
 /* BOTÃO FLUTUANTE */
 
-
 #btnDashboard {
   position: fixed;
   top: 100px;
   left: 10px;
-  z-index: 5000;
+  z-index: 4000; /* aumenta prioridade ✅ */
 
   background: linear-gradient(135deg, #ffcc00, #ff9900);
   border: none;
@@ -121,6 +120,7 @@ margin-top: 60px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
 
+
 /* DASHBOARD OCULTO */
 #dashboard {
   position: fixed;
@@ -130,7 +130,7 @@ margin-top: 60px;
   width: 240px;
   background: white;
   padding: 15px;
-  border-radius: 0 10px 10px 0;
+  border-radius: 10px;
   z-index: 2500;
 
   transition: all 0.3s ease;
@@ -403,23 +403,25 @@ document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
 document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
 }
 
+let dashboardAberto = false;
+
 function toggleDashboard() {
 
   const dash = document.getElementById("dashboard");
   const btn = document.getElementById("btnDashboard");
 
   if (dashboardAberto) {
-    dash.style.left = "-260px"; // esconde
-    btn.innerText = "📊";
+    dash.style.left = "-260px";
+    btn.innerText = "📊"; // fechado
   } else {
-    dash.style.left = "60px"; // 👈 MUITO IMPORTANTE
-    btn.innerText = "❌";
+    dash.style.left = "10px";
+    btn.innerText = "❌"; // aberto
   }
 
   dashboardAberto = !dashboardAberto;
 }
- 
-</script>
+
+ </script>
 
 </body>
 </html>
