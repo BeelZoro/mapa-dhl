@@ -230,8 +230,6 @@ const grupoRoxo = L.layerGroup().addTo(map);
 const grupoRosa = L.layerGroup().addTo(map);
   
 // ✅ FETCH CSV
-
-
 fetch('dados_mapa.xlsx?v=' + Date.now())
   .then(res => res.arrayBuffer())
   .then(data => {
@@ -267,7 +265,8 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
       else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
       else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
-
+      else if (tipo === "rosa") { grupo = grupoRoxo; icone = iconeRosa; }
+      
       if (grupo) {
         L.marker([lat, lng], { icon: icone })
           .bindPopup(nome)
