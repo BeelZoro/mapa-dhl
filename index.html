@@ -30,17 +30,18 @@ margin-top: 60px;
 
 #dashboard {
   position: fixed;
-  left: -260px; /* 🔥 ESCONDIDO */
+  left: -260px; /* 🔥 ESCONDIDO DE VERDADE */
   top: 80px;
 
   width: 240px;
   background: white;
   padding: 12px;
-  border-radius: 10px;
+  border-radius: 0 10px 10px 0;
 
   z-index: 2000;
   transition: all 0.3s ease;
 }
+
 
 /* CONTAINER FIXO */
 .painel-upload {
@@ -100,24 +101,20 @@ margin-top: 60px;
 }
 
 /* BOTÃO FLUTUANTE */
+
 #btnDashboard {
   position: fixed;
   top: 120px;
   left: 10px;
 
-  z-index: 99999; /* 🔥 MUITO ALTO */
+  z-index: 99999; /* 🔥 maior que tudo */
 
-  background: red; /* 👈 TEMPORÁRIO PRA TESTE */
+  background: red; /* pode tirar depois */
   color: white;
 
-  border: none;
   border-radius: 50%;
-
   width: 50px;
   height: 50px;
-
-  font-size: 20px;
-  cursor: pointer;
 }
 
 /* DASHBOARD OCULTO */
@@ -407,14 +404,11 @@ let dashboardAberto = false;
 function toggleDashboard() {
 
   const dash = document.getElementById("dashboard");
-  const btn = document.getElementById("btnDashboard");
 
   if (dashboardAberto) {
-    dash.style.left = "-260px";
-    btn.innerText = "📊"; // fechado
+    dash.style.left = "-260px"; // some
   } else {
-    dash.style.left = "10px";
-    btn.innerText = "❌"; // aberto
+    dash.style.left = "70px"; // aparece SEM cobrir botão
   }
 
   dashboardAberto = !dashboardAberto;
