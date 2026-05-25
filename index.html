@@ -30,16 +30,16 @@ margin-top: 60px;
 
 #dashboard {
   position: fixed;
-  left: -260px;
+  left: -260px; /* 🔥 ESCONDIDO */
   top: 80px;
 
   width: 240px;
   background: white;
-  padding: 15px;
+  padding: 12px;
   border-radius: 10px;
-  z-index: 2500;
 
-  transition: left 0.3s ease;
+  z-index: 2000;
+  transition: all 0.3s ease;
 }
 
 /* CONTAINER FIXO */
@@ -100,26 +100,25 @@ margin-top: 60px;
 }
 
 /* BOTÃO FLUTUANTE */
-
 #btnDashboard {
   position: fixed;
-  top: 100px;
+  top: 120px;
   left: 10px;
-  z-index: 4000; /* aumenta prioridade ✅ */
 
-  background: linear-gradient(135deg, #ffcc00, #ff9900);
+  z-index: 99999; /* 🔥 MUITO ALTO */
+
+  background: red; /* 👈 TEMPORÁRIO PRA TESTE */
+  color: white;
+
   border: none;
   border-radius: 50%;
 
-  width: 45px;
-  height: 45px;
+  width: 50px;
+  height: 50px;
 
   font-size: 20px;
   cursor: pointer;
-
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
-
 
 /* DASHBOARD OCULTO */
 #dashboard {
