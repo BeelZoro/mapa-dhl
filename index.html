@@ -29,16 +29,18 @@ margin-top: 60px;
 }
 
 #dashboard {
-position: fixed;
-left: 10px;
-top: 80px;
-background: white;
-padding: 12px;
-border-radius: 8px;
-z-index: 1500;
-font-family: Arial;
-}
+  position: fixed;
+  left: -260px;
+  top: 80px;
 
+  width: 240px;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  z-index: 2500;
+
+  transition: left 0.3s ease;
+}
 
 /* CONTAINER FIXO */
 .painel-upload {
@@ -98,11 +100,12 @@ font-family: Arial;
 }
 
 /* BOTÃO FLUTUANTE */
+
 #btnDashboard {
   position: fixed;
   top: 100px;
   left: 10px;
-  z-index: 3000;
+  z-index: 4000; /* aumenta prioridade ✅ */
 
   background: linear-gradient(135deg, #ffcc00, #ff9900);
   border: none;
@@ -116,6 +119,7 @@ font-family: Arial;
 
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
+
 
 /* DASHBOARD OCULTO */
 #dashboard {
