@@ -147,6 +147,22 @@ margin-top: 60px;
   📊
 </button>
 
+<input
+  type="text"
+  id="buscaNome"
+  placeholder="🔍 Buscar loja..."
+  style="
+    position: fixed;
+    top: 80px;
+    right: 10px;
+    z-index: 3000;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 200px;
+  "
+>
+
 </div>
 
 <div id="dashboard">
@@ -184,7 +200,7 @@ margin-top: 60px;
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <script>
-
+let marcadores = [];
 // ✅ MAPA
 const map = L.map('map', {
   zoomControl: false // remove zoom padrão
@@ -267,17 +283,20 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       else if (tipo === "rosa") { grupo = grupoRosa; icone = iconeRosa; }
 
       if (grupo) {
-        L.marker([lat, lng], { icon: icone })
-          .bindPopup(nome)
-          .addTo(grupo);
-      }
+        
+const marker = L.marker([lat, lng], { icon: icone })
+  .bindPopup(nome)
+  .addTo(grupo);
 
-    });
+// ✅ guardar referência
+marcadores.push({
+  nome: nome.toLowerCase(),
+  marker: marker
+});
 
     atualizarDashboard();
 
   });
-
 
 async function enviarParaGitHub() {
 
@@ -445,6 +464,29 @@ function toggleTodosMapa(ativo) {
   });
 
 }
+  
+document.getElementById("buscaNome").addEventListener("input", function() {
+
+  const busca = this.value.toLowerCase().trim();
+
+  if (!busca) return;
+
+  let encontrado = null;
+
+  for (let item of marcadores) {
+    if (item.nome.includes(busca)) {
+      encontrado = item.marker;
+      break;
+    }
+  }
+
+  if (encontrado) {
+    map.setView(encontrado.getLatLng(), 15); // zoom
+    encontrado.openPopup();
+  }
+
+});
+
  </script>
 
 </body>
