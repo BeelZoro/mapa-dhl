@@ -213,6 +213,9 @@ L.control.zoom({
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 L.Control.geocoder().addTo(map);
 
+const posicaoInicial = [-23.4543, -46.5337];
+const zoomInicial = 11;
+  
 // ✅ ÍCONES
 function criarIcone(cor) {
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">
@@ -467,11 +470,17 @@ function toggleTodosMapa(ativo) {
 
 }
   
+
 document.getElementById("buscaNome").addEventListener("input", function() {
 
   const busca = this.value.toLowerCase().trim();
 
-  if (!busca) return;
+  // ✅ AQUI FICA A MUDANÇA
+  if (!busca) {
+    map.setView(posicaoInicial, zoomInicial);
+    map.closePopup();
+    return;
+  }
 
   let encontrado = null;
 
@@ -483,7 +492,7 @@ document.getElementById("buscaNome").addEventListener("input", function() {
   }
 
   if (encontrado) {
-    map.setView(encontrado.getLatLng(), 15); // zoom
+    map.setView(encontrado.getLatLng(), 15);
     encontrado.openPopup();
   }
 
