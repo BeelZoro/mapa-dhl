@@ -283,17 +283,19 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       else if (tipo === "rosa") { grupo = grupoRosa; icone = iconeRosa; }
 
       if (grupo) {
-        
-const marker = L.marker([lat, lng], { icon: icone })
-  .bindPopup(nome)
-  .addTo(grupo);
+        const marker = L.marker([lat, lng], { icon: icone })
+          .bindPopup(nome)
+          .addTo(grupo);
 
-// ✅ guardar referência
-marcadores.push({
-  nome: nome.toLowerCase(),
-  marker: marker
-});
+        marcadores.push({
+          nome: nome.toLowerCase(),
+          marker: marker
+        });
+      }
 
+    });
+
+    // ✅ IMPORTANTE: fora do forEach
     atualizarDashboard();
 
   });
