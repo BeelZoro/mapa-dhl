@@ -204,47 +204,50 @@ margin-top: 60px;
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <script>
-let marcadores = [];
-// ✅ MAPA
-const map = L.map('map', {
-  zoomControl: false // remove zoom padrão
-}).setView([-23.4543, -46.5337], 11);
 
-L.control.zoom({
-  position: 'bottomleft'
-}).addTo(map);
+// MAPA
+// ==========================
+const map = L.map('map', { zoomControl: false }).setView([-23.4543, -46.5337], 11);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+// ==========================
+// GEOCODER (BUSCA ÚNICA)
+// ==========================
 const geocoder = L.Control.geocoder({
   defaultMarkGeocode: false
 }).addTo(map);
 
-const posicaoInicial = [-23.4543, -46.5337];
-const zoomInicial = 11;
-  
-// ✅ ÍCONES
+// ==========================
+// ICONES
+// ==========================
 function criarIcone(cor) {
-const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">
-  <path fill="${cor}" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>
-</svg>`;
-
-return new L.Icon({
-iconUrl: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
-iconSize: [25,41],
-iconAnchor: [12,41]
-});
+  return L.divIcon({
+    className: '',
+    html: `<div style="
+      width: 14px;
+      height: 14px;
+      background:${cor};
+      border-radius:50%;
+      border:2px solid white;
+      box-shadow:0 0 4px rgba(0,0,0,0.5);
+    "></div>`
+  });
 }
 
-// ✅ CORES
-const iconeAzul = criarIcone("#2962FF");
-const iconeVermelho = criarIcone("#D50000");
-const iconeVerde = criarIcone("#00C853");
-const iconeAmarelo = criarIcone("#FFD600");
-const iconeLaranja = criarIcone("#FF6D00");
-const iconeRoxo = criarIcone("#6A1B9A");
-const iconeRosa = criarIcone("#FF1493");  
+const iconeAzul = criarIcone("blue");
+const iconeVermelho = criarIcone("red");
+const iconeVerde = criarIcone("green");
+const iconeAmarelo = criarIcone("gold");
+const iconeLaranja = criarIcone("orange");
+const iconeRoxo = criarIcone("purple");
+const iconeRosa = criarIcone("pink");
 
-// ✅ GRUPOS
+// ==========================
+// GRUPOS
+// ==========================
 const grupoAzul = L.layerGroup().addTo(map);
 const grupoVermelho = L.layerGroup().addTo(map);
 const grupoVerde = L.layerGroup().addTo(map);
@@ -253,7 +256,14 @@ const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 const grupoRosa = L.layerGroup().addTo(map);
 
-// ✅ FETCH CSV
+// ==========================
+// ARRAY GLOBAL (BUSCA)
+// ==========================
+let marcadores = [];
+
+// ==========================
+// CARREGAR XLSX
+// ==========================
 fetch('dados_mapa.xlsx?v=' + Date.now())
   .then(res => res.arrayBuffer())
   .then(data => {
@@ -262,254 +272,45 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const json = XLSX.utils.sheet_to_json(sheet);
 
-    const unicos = new Set();
-
     json.forEach(linha => {
 
-      let nome = (linha.nome || "")
-        .toString()
-        .replace(/\n/g, ' ')
-        .trim();
-
+      let nome = (linha.nome || "").toString().trim();
       let lat = parseFloat(linha.lat);
       let lng = parseFloat(linha.lng);
-      let tipo = (linha.tipo || "").toLowerCase();
+      let tipo = (linha.tipo || "").toLowerCase().trim();
 
       if (!nome || isNaN(lat) || isNaN(lng)) return;
 
-      const chave = nome + lat + lng + tipo;
-      if (unicos.has(chave)) return;
-      unicos.add(chave);
-
-      let icone, grupo;
+      let grupo, icone;
 
       if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
+      else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
       else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
       else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
-      else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
       else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
       else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
       else if (tipo === "rosa") { grupo = grupoRosa; icone = iconeRosa; }
 
-      if (grupo) {
-        const marker = L.marker([lat, lng], { icon: icone })
-          .bindPopup(nome)
-          .addTo(grupo);
+      if (!grupo) return;
 
-        marcadores.push({
-          nome: nome.toLowerCase(),
-          marker: marker
-        });
-      }
+      const marker = L.marker([lat, lng], { icon: icone })
+        .bindPopup(nome)
+        .addTo(grupo);
+
+      // ✅ ARMAZENAR PARA BUSCA
+      marcadores.push({
+        nome: nome.toLowerCase(),
+        marker: marker
+      });
 
     });
 
-    // ✅ IMPORTANTE: fora do forEach
     atualizarDashboard();
-
   });
 
-async function enviarParaGitHub() {
-
-const file = document.getElementById('uploadExcel').files[0];
-
-if (!file) {
-alert("Selecione um arquivo!");
-return;
-}
-
-const token = prompt("Cole seu token do GitHub:");
-
-if (!token) {
-alert("Token é obrigatório!");
-return;
-}
-
-const base64 = await new Promise(resolve => {
-const reader = new FileReader();
-reader.onload = () => resolve(reader.result.split(',')[1]);
-reader.readAsDataURL(file);
-});
-
-let sha = null;
-
-const getFile = await fetch(
-"https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx?ref=main",
-{
-headers: {
-"Authorization": "token " + token
-}
-}
-);
-
-if (getFile.ok) {
-const data = await getFile.json();
-sha = data.sha;
-}
-
-const upload = await fetch(
-"https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx",
-{
-method: "PUT",
-headers: {
-"Authorization": "token " + token,
-"Content-Type": "application/json"
-},
-body: JSON.stringify({
-message: "Atualização via site",
-content: base64,
-sha: sha,
-branch: "main"
-})
-}
-);
-
-const result = await upload.json();
-
-if (upload.ok) {
-alert("✅ Upload realizado com sucesso!");
-location.reload();
-} else {
-console.error(result);
-alert("Erro: " + (result.message || "ver console"));
-}
-
-}
-
-// ✅ CONTROLE
-const controleLayers = L.control.layers(null, {
-"🔵 Shoppings": grupoAzul,
-"🔴 SPG": grupoVermelho,
-"🟢 Lojas de rua": grupoVerde,
-"🟡 Honda": grupoAmarelo,
-"🟠 BYD": grupoLaranja,
-"🟣 Stellantis": grupoRoxo,
-"🧬 Life Science": grupoRosa
-}, {collapsed:false}).addTo(map);
-
-setTimeout(() => {
-
-  const container = document.querySelector('.leaflet-control-layers-list');
-
-  if (!container) return;
-
-  const div = document.createElement("div");
-
-  div.innerHTML = `
-    <label style="font-weight:bold;">
-      <input type="checkbox" id="checkTodosMapa">
-      ✅ Selecionar Todos
-    </label>
-    <hr style="margin:5px 0;">
-  `;
-
-  container.insertBefore(div, container.firstChild);
-
-  document.getElementById("checkTodosMapa").addEventListener("change", function(e) {
-    toggleTodosMapa(e.target.checked);
-  });
-
-}, 500);
-
-// ✅ CHECKBOX
-function selecionarTodos(ativo) {
-if (ativo) {
-grupoAzul.addTo(map);
-grupoVerde.addTo(map);
-grupoVermelho.addTo(map);
-grupoAmarelo.addTo(map);
-grupoLaranja.addTo(map);
-grupoRoxo.addTo(map);
-grupoRosa.addTo(map);  
-}
-}
-
-function removerTodos(ativo) {
-if (ativo) {
-map.removeLayer(grupoAzul);
-map.removeLayer(grupoVerde);
-map.removeLayer(grupoVermelho);
-map.removeLayer(grupoAmarelo);
-map.removeLayer(grupoLaranja);
-map.removeLayer(grupoRoxo);
-map.removeLayer(grupoRosa);
-}
-}
-
-// ✅ DASHBOARD
-function atualizarDashboard() {
-document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
-document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
-document.getElementById("qtdVerde").innerText = grupoVerde.getLayers().length;
-document.getElementById("qtdAmarelo").innerText = grupoAmarelo.getLayers().length;
-document.getElementById("qtdLaranja").innerText = grupoLaranja.getLayers().length;
-document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
-document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
-}
-
-let dashboardAberto = false;
-
-function toggleDashboard() {
-
-  const dash = document.getElementById("dashboard");
-
-  if (dashboardAberto) {
-    dash.style.left = "-260px";
-  } else {
-    dash.style.left = "70px";
-  }
-
-  dashboardAberto = !dashboardAberto;
-}
-
-function toggleTodosMapa(ativo) {
-
-  const layersControl = document.querySelectorAll(
-    '.leaflet-control-layers-overlays input[type="checkbox"]'
-  );
-
-  layersControl.forEach(input => {
-    if (input.checked !== ativo) {
-      input.click(); // 🔥 sincroniza com Leaflet
-    }
-  });
-
-}
-
-  let resultados = marcadores.filter(item =>
-    item.nome.includes(busca)
-  );
-
-  resultados.slice(0, 8).forEach(item => {
-
-    const div = document.createElement("div");
-
-    div.innerText = item.nome;
-    div.style.padding = "8px";
-    div.style.cursor = "pointer";
-
-    div.addEventListener("mouseover", () => {
-      div.style.background = "#f0f0f0";
-    });
-
-    div.addEventListener("mouseout", () => {
-      div.style.background = "white";
-    });
-
-    div.addEventListener("click", () => {
-      map.setView(item.marker.getLatLng(), 15);
-      item.marker.openPopup();
-
-      lista.innerHTML = "";
-      document.getElementById("buscaNome").value = item.nome;
-    });
-
-    lista.appendChild(div);
-
-  });
-
-});
-
+// ==========================
+// BUSCA UNIFICADA
+// ==========================
 geocoder.on('markgeocode', function(e) {
 
   const busca = e.geocode.name.toLowerCase().trim();
@@ -524,24 +325,29 @@ geocoder.on('markgeocode', function(e) {
   }
 
   if (encontrado) {
-
-    // ✅ PRIORIDADE: lojas
     map.setView(encontrado.getLatLng(), 16);
     encontrado.openPopup();
 
-    // limpar campo
     document.querySelector('.leaflet-control-geocoder input').value = '';
-
   } else {
-
-    // ✅ fallback → endereço normal
     const bbox = e.geocode.bbox;
-    const bounds = L.latLngBounds(bbox);
-    map.fitBounds(bounds);
-
+    map.fitBounds(bbox);
   }
 
 });
+
+// ==========================
+// DASHBOARD
+// ==========================
+function atualizarDashboard() {
+  document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
+  document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
+  document.getElementById("qtdVerde").innerText = grupoVerde.getLayers().length;
+  document.getElementById("qtdAmarelo").innerText = grupoAmarelo.getLayers().length;
+  document.getElementById("qtdLaranja").innerText = grupoLaranja.getLayers().length;
+  document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
+  document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
+}
 
  </script>
 
