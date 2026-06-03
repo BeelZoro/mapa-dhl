@@ -153,22 +153,6 @@ margin-top: 60px;
   📊
 </button>
 
-<input
-  type="text"
-  id="buscaNome"
-  placeholder="🔍 Buscar loja..."
-  style="
-    position: fixed;
-    top: 80px;
-    right: 10px;
-    z-index: 3000;
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    width: 200px;
-  "
->
-
 </div>
 
 <div id="listaSugestoes" style="
@@ -234,7 +218,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 const geocoder = L.Control.geocoder({
   defaultMarkGeocode: false
 }).addTo(map);
-
 
 const posicaoInicial = [-23.4543, -46.5337];
 const zoomInicial = 11;
@@ -492,20 +475,6 @@ function toggleTodosMapa(ativo) {
   });
 
 }
-  
-
-document.getElementById("buscaNome").addEventListener("input", function() {
-
-  const busca = this.value.toLowerCase().trim();
-  const lista = document.getElementById("listaSugestoes");
-
-  lista.innerHTML = "";
-
-  if (!busca) {
-    map.setView(posicaoInicial, zoomInicial);
-    map.closePopup();
-    return;
-  }
 
   let resultados = marcadores.filter(item =>
     item.nome.includes(busca)
@@ -541,10 +510,9 @@ document.getElementById("buscaNome").addEventListener("input", function() {
 
 });
 
-
 geocoder.on('markgeocode', function(e) {
 
-  const busca = e.geocode.name.toLowerCase();
+  const busca = e.geocode.name.toLowerCase().trim();
 
   let encontrado = null;
 
@@ -556,15 +524,21 @@ geocoder.on('markgeocode', function(e) {
   }
 
   if (encontrado) {
-    // ✅ encontrou loja → prioriza loja
-    map.setView(encontrado.getLatLng(), 15);
+
+    // ✅ PRIORIDADE: lojas
+    map.setView(encontrado.getLatLng(), 16);
     encontrado.openPopup();
 
+    // limpar campo
+    document.querySelector('.leaflet-control-geocoder input').value = '';
+
   } else {
-    // ✅ não encontrou → usa resultado do geocoder
+
+    // ✅ fallback → endereço normal
     const bbox = e.geocode.bbox;
     const bounds = L.latLngBounds(bbox);
     map.fitBounds(bounds);
+
   }
 
 });
