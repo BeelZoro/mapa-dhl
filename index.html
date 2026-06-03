@@ -222,20 +222,46 @@ const geocoder = L.Control.geocoder({
   defaultMarkGeocode: false
 }).addTo(map);
 
+geocoder.on('markgeocode', function(e) {
+
+  const busca = document.querySelector('.leaflet-control-geocoder input')
+    .value
+    .toLowerCase()
+    .trim();
+
+  let encontrado = null;
+
+  for (let item of marcadores) {
+    if (item.nome.includes(busca)) {
+      encontrado = item.marker;
+      break;
+    }
+  }
+
+  if (encontrado) {
+    map.setView(encontrado.getLatLng(), 16);
+    encontrado.openPopup();
+  } else {
+    const bbox = e.geocode.bbox;
+    map.fitBounds(bbox);
+  }
+
+});
+
 // ==========================
 // ICONES
 // ==========================
+
 function criarIcone(cor) {
-  return L.divIcon({
-    className: '',
-    html: `<div style="
-      width: 14px;
-      height: 14px;
-      background:${cor};
-      border-radius:50%;
-      border:2px solid white;
-      box-shadow:0 0 4px rgba(0,0,0,0.5);
-    "></div>`
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">
+    <path fill="${cor}" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>
+  </svg>`;
+
+  return new L.Icon({
+    iconUrl: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
+    iconSize: [25, 41],
+    iconAnchor: [12, 41]
   });
 }
 
@@ -257,6 +283,16 @@ const grupoAmarelo = L.layerGroup().addTo(map);
 const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 const grupoRosa = L.layerGroup().addTo(map);
+
+L.control.layers(null, {
+  "🔵 Shoppings": grupoAzul,
+  "🔴 SPG": grupoVermelho,
+  "🟢 Lojas": grupoVerde,
+  "🟡 Honda": grupoAmarelo,
+  "🟠 BYD": grupoLaranja,
+  "🟣 Stellantis": grupoRoxo,
+  "💖 Life Science": grupoRosa
+}, { collapsed: false }).addTo(map);
 
 // ==========================
 // CARREGAR XLSX
@@ -402,7 +438,7 @@ setTimeout(() => {
 
       option.style.padding = "6px";
       option.style.cursor = "pointer";
-      option.innerText = item.nome;
+      option.innerText = item.nome.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
       option.onclick = function() {
         map.setView(item.marker.getLatLng(), 15);
