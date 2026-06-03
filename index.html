@@ -153,6 +153,22 @@ margin-top: 60px;
   📊
 </button>
 
+<input
+  type="text"
+  id="buscaNome"
+  placeholder="🔍 Buscar loja..."
+  style="
+    position: fixed;
+    top: 80px;
+    right: 10px;
+    z-index: 3000;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 200px;
+  "
+>
+
 </div>
 
 <div id="listaSugestoes" style="
@@ -204,78 +220,45 @@ margin-top: 60px;
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <script>
-//ARRAY DOS MARCADORES
-  let marcadores = [];
-  
-// MAPA
-// ==========================
-const map = L.map('map', { zoomControl: false }).setView([-23.4543, -46.5337], 11);
+let marcadores = [];
+// ✅ MAPA
+const map = L.map('map', {
+  zoomControl: false // remove zoom padrão
+}).setView([-23.4543, -46.5337], 11);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-L.control.zoom({ position: 'bottomleft' }).addTo(map);
-
-// ==========================
-// GEOCODER (BUSCA ÚNICA)
-// ==========================
-const geocoder = L.Control.geocoder({
-  defaultMarkGeocode: false
+L.control.zoom({
+  position: 'bottomleft'
 }).addTo(map);
 
-geocoder.on('markgeocode', function(e) {
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+L.Control.geocoder().addTo(map);
 
-  const busca = document.querySelector('.leaflet-control-geocoder input')
-    .value
-    .toLowerCase()
-    .trim();
-
-  let encontrado = null;
-
-  for (let item of marcadores) {
-    if (item.nome.includes(busca)) {
-      encontrado = item.marker;
-      break;
-    }
-  }
-
-  if (encontrado) {
-    map.setView(encontrado.getLatLng(), 16);
-    encontrado.openPopup();
-  } else {
-    const bbox = e.geocode.bbox;
-    map.fitBounds(bbox);
-  }
-
-});
-
-// ==========================
-// ICONES
-// ==========================
-
+const posicaoInicial = [-23.4543, -46.5337];
+const zoomInicial = 11;
+  
+// ✅ ÍCONES
 function criarIcone(cor) {
-  const svg = `
-  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">
-    <path fill="${cor}" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>
-  </svg>`;
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="25" height="41">
+  <path fill="${cor}" d="M12.5 0C5.6 0 0 5.6 0 12.5C0 21.4 12.5 41 12.5 41C12.5 41 25 21.4 25 12.5C25 5.6 19.4 0 12.5 0Z"/>
+</svg>`;
 
-  return new L.Icon({
-    iconUrl: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-  });
+return new L.Icon({
+iconUrl: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
+iconSize: [25,41],
+iconAnchor: [12,41]
+});
 }
 
-const iconeAzul = criarIcone("blue");
-const iconeVermelho = criarIcone("red");
-const iconeVerde = criarIcone("green");
-const iconeAmarelo = criarIcone("gold");
-const iconeLaranja = criarIcone("orange");
-const iconeRoxo = criarIcone("purple");
-const iconeRosa = criarIcone("pink");
+// ✅ CORES
+const iconeAzul = criarIcone("#2962FF");
+const iconeVermelho = criarIcone("#D50000");
+const iconeVerde = criarIcone("#00C853");
+const iconeAmarelo = criarIcone("#FFD600");
+const iconeLaranja = criarIcone("#FF6D00");
+const iconeRoxo = criarIcone("#6A1B9A");
+const iconeRosa = criarIcone("#FF1493");  
 
-// ==========================
-// GRUPOS
-// ==========================
+// ✅ GRUPOS
 const grupoAzul = L.layerGroup().addTo(map);
 const grupoVermelho = L.layerGroup().addTo(map);
 const grupoVerde = L.layerGroup().addTo(map);
@@ -284,20 +267,7 @@ const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 const grupoRosa = L.layerGroup().addTo(map);
 
-L.control.layers(null, {
-  "🔵 Shoppings": grupoAzul,
-  "🔴 SPG": grupoVermelho,
-  "🟢 Lojas": grupoVerde,
-  "🟡 Honda": grupoAmarelo,
-  "🟠 BYD": grupoLaranja,
-  "🟣 Stellantis": grupoRoxo,
-  "💖 Life Science": grupoRosa
-}, { collapsed: false }).addTo(map);
-
-// ==========================
-// CARREGAR XLSX
-// ==========================
-
+// ✅ FETCH CSV
 fetch('dados_mapa.xlsx?v=' + Date.now())
   .then(res => res.arrayBuffer())
   .then(data => {
@@ -325,7 +295,7 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       if (unicos.has(chave)) return;
       unicos.add(chave);
 
-      let grupo, icone;
+      let icone, grupo;
 
       if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
       else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
@@ -336,125 +306,238 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       else if (tipo === "rosa") { grupo = grupoRosa; icone = iconeRosa; }
 
       if (grupo) {
-
         const marker = L.marker([lat, lng], { icon: icone })
           .bindPopup(nome)
           .addTo(grupo);
 
-        // ✅ importante pra busca
         marcadores.push({
           nome: nome.toLowerCase(),
           marker: marker
         });
-
       }
 
     });
 
+    // ✅ IMPORTANTE: fora do forEach
     atualizarDashboard();
 
   });
 
-// ==========================
-// BUSCA UNIFICADA
-// ==========================
+async function enviarParaGitHub() {
 
-geocoder.on('markgeocode', function(e) {
+const file = document.getElementById('uploadExcel').files[0];
 
-  const busca = e.geocode.name.toLowerCase().trim();
+if (!file) {
+alert("Selecione um arquivo!");
+return;
+}
 
-  // 🔎 buscar em lojas
+const token = prompt("Cole seu token do GitHub:");
+
+if (!token) {
+alert("Token é obrigatório!");
+return;
+}
+
+const base64 = await new Promise(resolve => {
+const reader = new FileReader();
+reader.onload = () => resolve(reader.result.split(',')[1]);
+reader.readAsDataURL(file);
+});
+
+let sha = null;
+
+const getFile = await fetch(
+"https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx?ref=main",
+{
+headers: {
+"Authorization": "token " + token
+}
+}
+);
+
+if (getFile.ok) {
+const data = await getFile.json();
+sha = data.sha;
+}
+
+const upload = await fetch(
+"https://api.github.com/repos/BeelZoro/mapa-dhl/contents/dados_mapa.xlsx",
+{
+method: "PUT",
+headers: {
+"Authorization": "token " + token,
+"Content-Type": "application/json"
+},
+body: JSON.stringify({
+message: "Atualização via site",
+content: base64,
+sha: sha,
+branch: "main"
+})
+}
+);
+
+const result = await upload.json();
+
+if (upload.ok) {
+alert("✅ Upload realizado com sucesso!");
+location.reload();
+} else {
+console.error(result);
+alert("Erro: " + (result.message || "ver console"));
+}
+
+}
+
+// ✅ CONTROLE
+const controleLayers = L.control.layers(null, {
+"🔵 Shoppings": grupoAzul,
+"🔴 SPG": grupoVermelho,
+"🟢 Lojas de rua": grupoVerde,
+"🟡 Honda": grupoAmarelo,
+"🟠 BYD": grupoLaranja,
+"🟣 Stellantis": grupoRoxo,
+"🧬 Life Science": grupoRosa
+}, {collapsed:false}).addTo(map);
+
+setTimeout(() => {
+
+  const container = document.querySelector('.leaflet-control-layers-list');
+
+  if (!container) return;
+
+  const div = document.createElement("div");
+
+  div.innerHTML = `
+    <label style="font-weight:bold;">
+      <input type="checkbox" id="checkTodosMapa">
+      ✅ Selecionar Todos
+    </label>
+    <hr style="margin:5px 0;">
+  `;
+
+  container.insertBefore(div, container.firstChild);
+
+  document.getElementById("checkTodosMapa").addEventListener("change", function(e) {
+    toggleTodosMapa(e.target.checked);
+  });
+
+}, 500);
+
+// ✅ CHECKBOX
+function selecionarTodos(ativo) {
+if (ativo) {
+grupoAzul.addTo(map);
+grupoVerde.addTo(map);
+grupoVermelho.addTo(map);
+grupoAmarelo.addTo(map);
+grupoLaranja.addTo(map);
+grupoRoxo.addTo(map);
+grupoRosa.addTo(map);  
+}
+}
+
+function removerTodos(ativo) {
+if (ativo) {
+map.removeLayer(grupoAzul);
+map.removeLayer(grupoVerde);
+map.removeLayer(grupoVermelho);
+map.removeLayer(grupoAmarelo);
+map.removeLayer(grupoLaranja);
+map.removeLayer(grupoRoxo);
+map.removeLayer(grupoRosa);
+}
+}
+
+// ✅ DASHBOARD
+function atualizarDashboard() {
+document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
+document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
+document.getElementById("qtdVerde").innerText = grupoVerde.getLayers().length;
+document.getElementById("qtdAmarelo").innerText = grupoAmarelo.getLayers().length;
+document.getElementById("qtdLaranja").innerText = grupoLaranja.getLayers().length;
+document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
+document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
+}
+
+let dashboardAberto = false;
+
+function toggleDashboard() {
+
+  const dash = document.getElementById("dashboard");
+
+  if (dashboardAberto) {
+    dash.style.left = "-260px";
+  } else {
+    dash.style.left = "70px";
+  }
+
+  dashboardAberto = !dashboardAberto;
+}
+
+function toggleTodosMapa(ativo) {
+
+  const layersControl = document.querySelectorAll(
+    '.leaflet-control-layers-overlays input[type="checkbox"]'
+  );
+
+  layersControl.forEach(input => {
+    if (input.checked !== ativo) {
+      input.click(); // 🔥 sincroniza com Leaflet
+    }
+  });
+
+}
+  
+
+document.getElementById("buscaNome").addEventListener("input", function() {
+
+  const busca = this.value.toLowerCase().trim();
+  const lista = document.getElementById("listaSugestoes");
+
+  lista.innerHTML = "";
+
+  if (!busca) {
+    map.setView(posicaoInicial, zoomInicial);
+    map.closePopup();
+    return;
+  }
+
   let resultados = marcadores.filter(item =>
     item.nome.includes(busca)
   );
 
-  if (resultados.length > 0) {
+  resultados.slice(0, 8).forEach(item => {
 
-    const marker = resultados[0].marker;
+    const div = document.createElement("div");
 
-    map.setView(marker.getLatLng(), 15);
-    marker.openPopup();
+    div.innerText = item.nome;
+    div.style.padding = "8px";
+    div.style.cursor = "pointer";
 
-    return;
-  }
-
-  // 📍 fallback (endereço)
-  const bbox = e.geocode.bbox;
-  map.fitBounds(bbox);
-
-});
-
-// ==========================
-// DASHBOARD
-// ==========================
-function atualizarDashboard() {
-  document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
-  document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
-  document.getElementById("qtdVerde").innerText = grupoVerde.getLayers().length;
-  document.getElementById("qtdAmarelo").innerText = grupoAmarelo.getLayers().length;
-  document.getElementById("qtdLaranja").innerText = grupoLaranja.getLayers().length;
-  document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
-  document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
-}
-    
-
-setTimeout(() => {
-
-  const inputBusca = document.querySelector('.leaflet-control-geocoder input');
-
-  if (!inputBusca) return;
-
-  // criar lista de sugestões
-  const listaSugestoes = document.createElement("div");
-
-  listaSugestoes.style.position = "absolute";
-  listaSugestoes.style.top = "35px";
-  listaSugestoes.style.left = "0";
-  listaSugestoes.style.right = "0";
-  listaSugestoes.style.background = "#fff";
-  listaSugestoes.style.border = "1px solid #ccc";
-  listaSugestoes.style.zIndex = "9999";
-  listaSugestoes.style.maxHeight = "200px";
-  listaSugestoes.style.overflowY = "auto";
-
-  inputBusca.parentElement.style.position = "relative";
-  inputBusca.parentElement.appendChild(listaSugestoes);
-
-  inputBusca.addEventListener("input", function() {
-
-    const termo = inputBusca.value.toLowerCase().trim();
-
-    listaSugestoes.innerHTML = "";
-
-    if (!termo) return;
-
-    const resultados = marcadores.filter(item =>
-      item.nome.includes(termo)
-    ).slice(0, 5);
-
-    resultados.forEach(item => {
-
-      const option = document.createElement("div");
-
-      option.style.padding = "6px";
-      option.style.cursor = "pointer";
-      option.innerText = item.nome.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-
-      option.onclick = function() {
-        map.setView(item.marker.getLatLng(), 15);
-        item.marker.openPopup();
-
-        listaSugestoes.innerHTML = "";
-        inputBusca.value = "";
-      };
-
-      listaSugestoes.appendChild(option);
-
+    div.addEventListener("mouseover", () => {
+      div.style.background = "#f0f0f0";
     });
+
+    div.addEventListener("mouseout", () => {
+      div.style.background = "white";
+    });
+
+    div.addEventListener("click", () => {
+      map.setView(item.marker.getLatLng(), 15);
+      item.marker.openPopup();
+
+      lista.innerHTML = "";
+      document.getElementById("buscaNome").value = item.nome;
+    });
+
+    lista.appendChild(div);
 
   });
 
-}, 500);
+});
+
 
  </script>
 
