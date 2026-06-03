@@ -261,6 +261,7 @@ const grupoRosa = L.layerGroup().addTo(map);
 // ==========================
 // CARREGAR XLSX
 // ==========================
+
 fetch('dados_mapa.xlsx?v=' + Date.now())
   .then(res => res.arrayBuffer())
   .then(data => {
@@ -269,44 +270,53 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const json = XLSX.utils.sheet_to_json(sheet);
 
+    const unicos = new Set();
+
     json.forEach(linha => {
 
-      let nome = (linha.nome || "").toString().trim();
+      let nome = (linha.nome || "")
+        .toString()
+        .replace(/\n/g, ' ')
+        .trim();
+
       let lat = parseFloat(linha.lat);
       let lng = parseFloat(linha.lng);
-      let tipo = (linha.tipo || "").toLowerCase().trim();
+      let tipo = (linha.tipo || "").toLowerCase();
 
       if (!nome || isNaN(lat) || isNaN(lng)) return;
+
+      const chave = nome + lat + lng + tipo;
+      if (unicos.has(chave)) return;
+      unicos.add(chave);
 
       let grupo, icone;
 
       if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
-      else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
       else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
       else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
+      else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
       else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
       else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
       else if (tipo === "rosa") { grupo = grupoRosa; icone = iconeRosa; }
 
-      if (!grupo) return;
+      if (grupo) {
 
-const marker = L.marker([lat, lng], { icon: icone })
-  .bindPopup(nome)
-  .addTo(grupo);
+        const marker = L.marker([lat, lng], { icon: icone })
+          .bindPopup(nome)
+          .addTo(grupo);
 
-// ✅ guardar para busca
-marcadores.push({
-  nome: nome.toLowerCase(),
-  marker: marker
-});
+        // ✅ importante pra busca
+        marcadores.push({
+          nome: nome.toLowerCase(),
+          marker: marker
+        });
 
-      // ✅ ARMAZENAR PARA BUSCA
-      marcadores.push({
-        nome: nome.toLowerCase(),
-        marker: marker
-      });
-    }
+      }
+
+    });
+
     atualizarDashboard();
+
   });
 
 // ==========================
