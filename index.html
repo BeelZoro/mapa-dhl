@@ -204,7 +204,9 @@ margin-top: 60px;
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <script>
-
+//ARRAY DOS MARCADORES
+  let marcadores = [];
+  
 // MAPA
 // ==========================
 const map = L.map('map', { zoomControl: false }).setView([-23.4543, -46.5337], 11);
@@ -257,11 +259,6 @@ const grupoRoxo = L.layerGroup().addTo(map);
 const grupoRosa = L.layerGroup().addTo(map);
 
 // ==========================
-// ARRAY GLOBAL (BUSCA)
-// ==========================
-let marcadores = [];
-
-// ==========================
 // CARREGAR XLSX
 // ==========================
 fetch('dados_mapa.xlsx?v=' + Date.now())
@@ -293,9 +290,15 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
 
       if (!grupo) return;
 
-      const marker = L.marker([lat, lng], { icon: icone })
-        .bindPopup(nome)
-        .addTo(grupo);
+const marker = L.marker([lat, lng], { icon: icone })
+  .bindPopup(nome)
+  .addTo(grupo);
+
+// ✅ guardar para busca
+marcadores.push({
+  nome: nome.toLowerCase(),
+  marker: marker
+});
 
       // ✅ ARMAZENAR PARA BUSCA
       marcadores.push({
@@ -309,28 +312,29 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
 // ==========================
 // BUSCA UNIFICADA
 // ==========================
+
 geocoder.on('markgeocode', function(e) {
 
   const busca = e.geocode.name.toLowerCase().trim();
 
-  let encontrado = null;
+  // 🔎 buscar em lojas
+  let resultados = marcadores.filter(item =>
+    item.nome.includes(busca)
+  );
 
-  for (let item of marcadores) {
-    if (item.nome.includes(busca)) {
-      encontrado = item.marker;
-      break;
-    }
+  if (resultados.length > 0) {
+
+    const marker = resultados[0].marker;
+
+    map.setView(marker.getLatLng(), 15);
+    marker.openPopup();
+
+    return;
   }
 
-  if (encontrado) {
-    map.setView(encontrado.getLatLng(), 16);
-    encontrado.openPopup();
-
-    document.querySelector('.leaflet-control-geocoder input').value = '';
-  } else {
-    const bbox = e.geocode.bbox;
-    map.fitBounds(bbox);
-  }
+  // 📍 fallback (endereço)
+  const bbox = e.geocode.bbox;
+  map.fitBounds(bbox);
 
 });
 
@@ -346,6 +350,56 @@ function atualizarDashboard() {
   document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
   document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
 }
+    
+const inputBusca = document.querySelector('.leaflet-control-geocoder input');
+
+// criar dropdown
+const listaSugestoes = document.createElement("div");
+
+listaSugestoes.style.position = "absolute";
+listaSugestoes.style.top = "40px";
+listaSugestoes.style.left = "0";
+listaSugestoes.style.right = "0";
+listaSugestoes.style.background = "white";
+listaSugestoes.style.border = "1px solid #ccc";
+listaSugestoes.style.zIndex = "9999";
+listaSugestoes.style.maxHeight = "200px";
+listaSugestoes.style.overflowY = "auto";
+
+inputBusca.parentElement.appendChild(listaSugestoes);
+
+inputBusca.addEventListener("input", function() {
+
+  const termo = this.value.toLowerCase().trim();
+
+  listaSugestoes.innerHTML = "";
+
+  if (!termo) return;
+
+  const resultados = marcadores.filter(item =>
+    item.nome.includes(termo)
+  ).slice(0, 5); // limitar sugestões
+
+  resultados.forEach(item => {
+
+    const div = document.createElement("div");
+
+    div.style.padding = "6px";
+    div.style.cursor = "pointer";
+    div.innerText = item.nome;
+
+    div.onclick = function() {
+      map.setView(item.marker.getLatLng(), 15);
+      item.marker.openPopup();
+
+      listaSugestoes.innerHTML = "";
+      inputBusca.value = "";
+    };
+
+    listaSugestoes.appendChild(div);
+  });
+
+});
 
  </script>
 
