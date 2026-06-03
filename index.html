@@ -363,24 +363,26 @@ function atualizarDashboard() {
     
 const inputBusca = document.querySelector('.leaflet-control-geocoder input');
 
-// criar dropdown
+// criar lista de sugestões
 const listaSugestoes = document.createElement("div");
 
 listaSugestoes.style.position = "absolute";
-listaSugestoes.style.top = "40px";
+listaSugestoes.style.top = "35px";
 listaSugestoes.style.left = "0";
 listaSugestoes.style.right = "0";
-listaSugestoes.style.background = "white";
+listaSugestoes.style.background = "#fff";
 listaSugestoes.style.border = "1px solid #ccc";
 listaSugestoes.style.zIndex = "9999";
 listaSugestoes.style.maxHeight = "200px";
 listaSugestoes.style.overflowY = "auto";
 
+inputBusca.parentElement.style.position = "relative";
 inputBusca.parentElement.appendChild(listaSugestoes);
 
+// evento de digitação
 inputBusca.addEventListener("input", function() {
 
-  const termo = this.value.toLowerCase().trim();
+  const termo = inputBusca.value.toLowerCase().trim();
 
   listaSugestoes.innerHTML = "";
 
@@ -388,26 +390,29 @@ inputBusca.addEventListener("input", function() {
 
   const resultados = marcadores.filter(item =>
     item.nome.includes(termo)
-  ).slice(0, 5); // limitar sugestões
+  ).slice(0, 5);
 
   resultados.forEach(item => {
 
-    const div = document.createElement("div");
+    const option = document.createElement("div");
 
-    div.style.padding = "6px";
-    div.style.cursor = "pointer";
-    div.innerText = item.nome;
+    option.style.padding = "6px";
+    option.style.cursor = "pointer";
+    option.innerText = item.nome;
 
-    div.onclick = function() {
+    option.addEventListener("click", function() {
       map.setView(item.marker.getLatLng(), 15);
       item.marker.openPopup();
 
       listaSugestoes.innerHTML = "";
       inputBusca.value = "";
-    };
+    });
 
-    listaSugestoes.appendChild(div);
+    listaSugestoes.appendChild(option);
+
   });
+
+});
 
  </script>
 
