@@ -361,58 +361,64 @@ function atualizarDashboard() {
   document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
 }
     
-const inputBusca = document.querySelector('.leaflet-control-geocoder input');
 
-// criar lista de sugestões
-const listaSugestoes = document.createElement("div");
+setTimeout(() => {
 
-listaSugestoes.style.position = "absolute";
-listaSugestoes.style.top = "35px";
-listaSugestoes.style.left = "0";
-listaSugestoes.style.right = "0";
-listaSugestoes.style.background = "#fff";
-listaSugestoes.style.border = "1px solid #ccc";
-listaSugestoes.style.zIndex = "9999";
-listaSugestoes.style.maxHeight = "200px";
-listaSugestoes.style.overflowY = "auto";
+  const inputBusca = document.querySelector('.leaflet-control-geocoder input');
 
-inputBusca.parentElement.style.position = "relative";
-inputBusca.parentElement.appendChild(listaSugestoes);
+  if (!inputBusca) return;
 
-// evento de digitação
-inputBusca.addEventListener("input", function() {
+  // criar lista de sugestões
+  const listaSugestoes = document.createElement("div");
 
-  const termo = inputBusca.value.toLowerCase().trim();
+  listaSugestoes.style.position = "absolute";
+  listaSugestoes.style.top = "35px";
+  listaSugestoes.style.left = "0";
+  listaSugestoes.style.right = "0";
+  listaSugestoes.style.background = "#fff";
+  listaSugestoes.style.border = "1px solid #ccc";
+  listaSugestoes.style.zIndex = "9999";
+  listaSugestoes.style.maxHeight = "200px";
+  listaSugestoes.style.overflowY = "auto";
 
-  listaSugestoes.innerHTML = "";
+  inputBusca.parentElement.style.position = "relative";
+  inputBusca.parentElement.appendChild(listaSugestoes);
 
-  if (!termo) return;
+  inputBusca.addEventListener("input", function() {
 
-  const resultados = marcadores.filter(item =>
-    item.nome.includes(termo)
-  ).slice(0, 5);
+    const termo = inputBusca.value.toLowerCase().trim();
 
-  resultados.forEach(item => {
+    listaSugestoes.innerHTML = "";
 
-    const option = document.createElement("div");
+    if (!termo) return;
 
-    option.style.padding = "6px";
-    option.style.cursor = "pointer";
-    option.innerText = item.nome;
+    const resultados = marcadores.filter(item =>
+      item.nome.includes(termo)
+    ).slice(0, 5);
 
-    option.addEventListener("click", function() {
-      map.setView(item.marker.getLatLng(), 15);
-      item.marker.openPopup();
+    resultados.forEach(item => {
 
-      listaSugestoes.innerHTML = "";
-      inputBusca.value = "";
+      const option = document.createElement("div");
+
+      option.style.padding = "6px";
+      option.style.cursor = "pointer";
+      option.innerText = item.nome;
+
+      option.onclick = function() {
+        map.setView(item.marker.getLatLng(), 15);
+        item.marker.openPopup();
+
+        listaSugestoes.innerHTML = "";
+        inputBusca.value = "";
+      };
+
+      listaSugestoes.appendChild(option);
+
     });
-
-    listaSugestoes.appendChild(option);
 
   });
 
-});
+}, 500);
 
  </script>
 
