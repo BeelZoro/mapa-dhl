@@ -231,7 +231,10 @@ L.control.zoom({
 }).addTo(map);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-L.Control.geocoder().addTo(map);
+const geocoder = L.Control.geocoder({
+  defaultMarkGeocode: false
+}).addTo(map);
+
 
 const posicaoInicial = [-23.4543, -46.5337];
 const zoomInicial = 11;
@@ -538,6 +541,33 @@ document.getElementById("buscaNome").addEventListener("input", function() {
 
 });
 
+
+geocoder.on('markgeocode', function(e) {
+
+  const busca = e.geocode.name.toLowerCase();
+
+  let encontrado = null;
+
+  for (let item of marcadores) {
+    if (item.nome.includes(busca)) {
+      encontrado = item.marker;
+      break;
+    }
+  }
+
+  if (encontrado) {
+    // ✅ encontrou loja → prioriza loja
+    map.setView(encontrado.getLatLng(), 15);
+    encontrado.openPopup();
+
+  } else {
+    // ✅ não encontrou → usa resultado do geocoder
+    const bbox = e.geocode.bbox;
+    const bounds = L.latLngBounds(bbox);
+    map.fitBounds(bounds);
+  }
+
+});
 
  </script>
 
