@@ -495,22 +495,20 @@ setTimeout(() => {
 
   const lista = document.createElement("div");
 
-  lista.style.position = "absolute";
-  lista.style.top = "35px";
-  lista.style.left = "0";
-  lista.style.right = "0";
-  lista.style.background = "#fff";
-  lista.style.border = "1px solid #ccc";
-  lista.style.zIndex = "9999999";
-  lista.style.maxHeight = "200px";
-  lista.style.overflowY = "auto";
-  lista.style.pointerEvents = "auto";
-  lista.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
+lista.style.position = "fixed"; 
+lista.style.top = "70px";
+lista.style.right = "10px";
+lista.style.width = "250px";
 
-  inputBusca.parentElement.style.position = "relative";
-  inputBusca.parentElement.appendChild(lista);
+lista.style.background = "#fff";
+lista.style.border = "1px solid #ccc";
+lista.style.zIndex = "999999999";
+lista.style.maxHeight = "200px";
+lista.style.overflowY = "auto";
+lista.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
 
- 
+document.body.appendChild(lista);
+  
 let indiceSelecionado = -1;
 
 inputBusca.addEventListener("input", function() {
