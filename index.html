@@ -368,22 +368,23 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       else if (tipo === "rosa") { grupo = grupoRosa; icone = iconeRosa; }
 
       if (grupo) {
-        const marker = L.marker([lat, lng], { icon: icone })
-          
-        .on("click", function() {
 
-        const painel = document.getElementById("painelInfo");
-        const titulo = document.getElementById("tituloPainel");
+const marker = L.marker([lat, lng], { icon: icone })
+  .addTo(grupo)
+  .on("click", function() {
 
-        titulo.innerText = nome;
+    const painel = document.getElementById("painelInfo");
+    const titulo = document.getElementById("tituloPainel");
 
-        painel.style.right = "10px";
+    titulo.innerText = nome;
 
-});
+    painel.style.right = "10px";
+
+  });
 
           .addTo(grupo);
 
-marker.on("click", function() {
+          marker.on("click", function() {
 
   const item = marcadores.find(m => m.marker === marker);
 
