@@ -307,7 +307,11 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
     json.forEach(linha => {
 
       let nome = (linha.nome || "")
-      let descricao = (linha.descricao || "").toString().trim();  
+              .toString()
+        .replace(/\n/g, ' ')
+        .trim();
+    
+      let descricao = (linha.descricao || "Sem descrição").toString().trim()
         .toString()
         .replace(/\n/g, ' ')
         .trim();
