@@ -153,38 +153,8 @@ margin-top: 60px;
   📊
 </button>
 
-<input
-  type="text"
-  id="buscaNome"
-  placeholder="🔍 Buscar loja..."
-  style="
-    position: fixed;
-    top: 80px;
-    right: 10px;
-    z-index: 3000;
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    width: 200px;
-  "
->
-
 </div>
 
-<div id="listaSugestoes" style="
-  position: fixed;
-  top: 115px;
-  right: 10px;
-  z-index: 3000;
-  width: 200px;
-  background: white;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-  max-height: 200px;
-  overflow-y: auto;
-"></div>
-
-  
 <div id="dashboard">
 <h3>📊 Resumo</h3>
   
@@ -231,8 +201,35 @@ L.control.zoom({
 }).addTo(map);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-L.Control.geocoder().addTo(map);
 
+const geocoder = L.Control.geocoder({
+  defaultMarkGeocode: false
+}).addTo(map);
+
+geocoder.on('markgeocode', function(e) {
+
+  const input = document.querySelector('.leaflet-control-geocoder input');
+  const busca = input.value.toLowerCase().trim();
+
+  let encontrado = null;
+
+  for (let item of marcadores) {
+    if (item.nome.includes(busca)) {
+      encontrado = item.marker;
+      break;
+    }
+  }
+
+  if (encontrado) {
+    map.setView(encontrado.getLatLng(), 16);
+    encontrado.openPopup();
+  } else {
+    const bbox = e.geocode.bbox;
+    map.fitBounds(bbox);
+  }
+
+});
+ 
 const posicaoInicial = [-23.4543, -46.5337];
 const zoomInicial = 11;
   
@@ -490,54 +487,60 @@ function toggleTodosMapa(ativo) {
 
 }
   
+setTimeout(() => {
 
-document.getElementById("buscaNome").addEventListener("input", function() {
+  const inputBusca = document.querySelector('.leaflet-control-geocoder input');
 
-  const busca = this.value.toLowerCase().trim();
-  const lista = document.getElementById("listaSugestoes");
+  if (!inputBusca) return;
 
-  lista.innerHTML = "";
+  const lista = document.createElement("div");
 
-  if (!busca) {
-    map.setView(posicaoInicial, zoomInicial);
-    map.closePopup();
-    return;
-  }
+  lista.style.position = "absolute";
+  lista.style.top = "35px";
+  lista.style.left = "0";
+  lista.style.right = "0";
+  lista.style.background = "#fff";
+  lista.style.border = "1px solid #ccc";
+  lista.style.zIndex = "9999";
+  lista.style.maxHeight = "200px";
+  lista.style.overflowY = "auto";
 
-  let resultados = marcadores.filter(item =>
-    item.nome.includes(busca)
-  );
+  inputBusca.parentElement.style.position = "relative";
+  inputBusca.parentElement.appendChild(lista);
 
-  resultados.slice(0, 8).forEach(item => {
+  inputBusca.addEventListener("input", function() {
 
-    const div = document.createElement("div");
+    const termo = inputBusca.value.toLowerCase().trim();
 
-    div.innerText = item.nome;
-    div.style.padding = "8px";
-    div.style.cursor = "pointer";
+    lista.innerHTML = "";
 
-    div.addEventListener("mouseover", () => {
-      div.style.background = "#f0f0f0";
+    if (!termo) return;
+
+    const resultados = marcadores.filter(item =>
+      item.nome.includes(termo)
+    ).slice(0, 5);
+
+    resultados.forEach(item => {
+
+      const div = document.createElement("div");
+
+      div.style.padding = "6px";
+      div.style.cursor = "pointer";
+      div.innerText = item.nome;
+
+      div.onclick = function() {
+        map.setView(item.marker.getLatLng(), 16);
+        item.marker.openPopup();
+        lista.innerHTML = "";
+      };
+
+      lista.appendChild(div);
+
     });
-
-    div.addEventListener("mouseout", () => {
-      div.style.background = "white";
-    });
-
-    div.addEventListener("click", () => {
-      map.setView(item.marker.getLatLng(), 15);
-      item.marker.openPopup();
-
-      lista.innerHTML = "";
-      document.getElementById("buscaNome").value = item.nome;
-    });
-
-    lista.appendChild(div);
 
   });
 
-});
-
+}, 500);
 
  </script>
 
