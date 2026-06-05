@@ -193,6 +193,7 @@ font-family: 'Inter', sans-serif;
 
 <script>
 let marcadores = [];
+let marcadorSelecionado = null;  
 // ✅ MAPA
 const map = L.map('map', {
   zoomControl: false // remove zoom padrão
@@ -225,6 +226,9 @@ geocoder.on('markgeocode', function(e) {
   if (encontrado) {
     map.setView(encontrado.getLatLng(), 16);
     encontrado.openPopup();
+
+    destacarMarker(encontrado);
+    
   } else {
     const bbox = e.geocode.bbox;
     map.fitBounds(bbox);
@@ -634,6 +638,7 @@ function selecionarItem(item) {
         map.setView(item.marker.getLatLng(), 16);
         item.marker.openPopup();
         lista.innerHTML = "";
+        destacarMarker(item.marker)
       };
 
       lista.appendChild(div);
@@ -641,6 +646,20 @@ function selecionarItem(item) {
     });
 
 }, 500);
+
+//destacar o marker
+function destacarMarker(marker) {
+
+  // remove destaque anterior
+  if (marcadorSelecionado) {
+    marcadorSelecionado.setZIndexOffset(0);
+  }
+
+  // aplica destaque no novo
+  marker.setZIndexOffset(1000); // traz pra frente
+
+  marcadorSelecionado = marker;
+}
 
  </script>
 
