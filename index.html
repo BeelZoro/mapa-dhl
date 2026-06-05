@@ -49,7 +49,7 @@ margin-top: 60px;
   position: fixed;
   bottom: 0px;
   right: 0px;
-  z-index: 9999;
+  z-index: 999;
 
   background: white;
   padding: 15px;
@@ -398,7 +398,6 @@ const controleLayers = L.control.layers(null, {
 "🧬 Life Science": grupoRosa
 }, {collapsed:false}).addTo(map);
 
-
 setTimeout(() => {
 
   const container = document.querySelector('.leaflet-control-layers-list');
@@ -502,7 +501,7 @@ setTimeout(() => {
   lista.style.right = "0";
   lista.style.background = "#fff";
   lista.style.border = "1px solid #ccc";
-  lista.style.zIndex = "999999";
+  lista.style.zIndex = "9999999";
   lista.style.maxHeight = "200px";
   lista.style.overflowY = "auto";
   lista.style.pointerEvents = "auto";
