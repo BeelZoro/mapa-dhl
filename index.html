@@ -398,6 +398,7 @@ const controleLayers = L.control.layers(null, {
 "🧬 Life Science": grupoRosa
 }, {collapsed:false}).addTo(map);
 
+
 setTimeout(() => {
 
   const container = document.querySelector('.leaflet-control-layers-list');
@@ -501,14 +502,116 @@ setTimeout(() => {
   lista.style.right = "0";
   lista.style.background = "#fff";
   lista.style.border = "1px solid #ccc";
-  lista.style.zIndex = "9999";
+  lista.style.zIndex = "999999";
   lista.style.maxHeight = "200px";
   lista.style.overflowY = "auto";
+  lista.style.pointerEvents = "auto";
+  lista.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
 
   inputBusca.parentElement.style.position = "relative";
   inputBusca.parentElement.appendChild(lista);
 
-  inputBusca.addEventListener("input", function() {
+ 
+let indiceSelecionado = -1;
+
+inputBusca.addEventListener("input", function() {
+
+  const termo = inputBusca.value.toLowerCase().trim();
+
+  lista.innerHTML = "";
+  indiceSelecionado = -1;
+
+  if (!termo) return;
+
+  const resultados = marcadores.filter(item =>
+    item.nome.includes(termo)
+  ).slice(0, 5);
+
+  resultados.forEach((item, index) => {
+
+    const div = document.createElement("div");
+
+    div.style.padding = "6px";
+    div.style.cursor = "pointer";
+    div.innerText = item.nome;
+
+    // ✅ HOVER (visual)
+    div.addEventListener("mouseover", () => {
+      destacar(index);
+    });
+
+    div.addEventListener("mouseout", () => {
+      removerDestaque();
+    });
+
+    // ✅ CLICK
+    div.onclick = function() {
+      selecionarItem(item);
+    };
+
+    lista.appendChild(div);
+
+  });
+
+});
+
+// ✅ controle de teclado
+inputBusca.addEventListener("keydown", function(e) {
+
+  const itens = lista.querySelectorAll("div");
+
+  if (e.key === "ArrowDown") {
+    indiceSelecionado = Math.min(indiceSelecionado + 1, itens.length - 1);
+    destacar(indiceSelecionado);
+  }
+
+  if (e.key === "ArrowUp") {
+    indiceSelecionado = Math.max(indiceSelecionado - 1, 0);
+    destacar(indiceSelecionado);
+  }
+
+  if (e.key === "Enter") {
+    if (indiceSelecionado >= 0 && lista.children[indiceSelecionado]) {
+
+      const nome = lista.children[indiceSelecionado].innerText;
+
+      const item = marcadores.find(m =>
+        m.nome === nome.toLowerCase()
+      );
+
+      if (item) {
+        selecionarItem(item);
+      }
+    }
+  }
+  
+});
+
+function destacar(index) {
+
+  const itens = lista.querySelectorAll("div");
+
+  itens.forEach(i => i.style.background = "white");
+
+  if (itens[index]) {
+    itens[index].style.background = "#e6f0ff";
+    indiceSelecionado = index;
+  }
+
+}
+
+function removerDestaque() {
+  const itens = lista.querySelectorAll("div");
+  itens.forEach(i => i.style.background = "white");
+}
+
+function selecionarItem(item) {
+
+  map.setView(item.marker.getLatLng(), 16);
+  item.marker.openPopup();
+
+  lista.innerHTML = "";
+}
 
     const termo = inputBusca.value.toLowerCase().trim();
 
