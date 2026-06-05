@@ -382,8 +382,6 @@ const marker = L.marker([lat, lng], { icon: icone })
 
   });
 
-          .addTo(grupo);
-
           marker.on("click", function() {
 
   const item = marcadores.find(m => m.marker === marker);
