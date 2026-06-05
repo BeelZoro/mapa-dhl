@@ -132,6 +132,23 @@ margin-top: 60px;
 
   transition: all 0.3s ease;
 }
+  
+#painelInfo {
+  position: fixed;
+  right: -300px;
+  top: 60px;
+
+  width: 280px;
+  height: 100%;
+
+  background: white;
+  padding: 15px;
+
+  z-index: 9999;
+  transition: right 0.3s ease;
+
+  box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+}
 
 #listaSugestoes div:hover {
   background: #f5f5f5;
@@ -170,6 +187,12 @@ font-family: 'Inter', sans-serif;
 <p>🟣 Stellantis: <span id="qtdRoxo">0</span></p>
 <p>🧬 Life Science: <span id="qtdRosa">0</span></p>  
 </font>
+</div>
+
+<div id="painelInfo">
+  <h3 id="tituloInfo"></h3>
+  <p id="tipoInfo"></p>
+  <p id="descricaoInfo"></p>
 </div>
 
 <div id="map"></div>
@@ -284,6 +307,7 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
     json.forEach(linha => {
 
       let nome = (linha.nome || "")
+      let descricao = (linha.descricao || "").toString().trim();  
         .toString()
         .replace(/\n/g, ' ')
         .trim();
@@ -313,10 +337,23 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
           .bindPopup(nome)
           .addTo(grupo);
 
-        marcadores.push({
-          nome: nome.toLowerCase(),
-          marker: marker
-        });
+marker.on("click", function() {
+
+  const item = marcadores.find(m => m.marker === marker);
+
+  if (item) {
+    abrirPainelInfo(nome, tipo, item.descricao);
+  }
+
+});
+
+marcadores.push({
+  nome: nome.toLowerCase(),
+  marker: marker,
+  descricao: descricao,
+  tipo: tipo
+});
+
       }
 
     });
@@ -659,6 +696,15 @@ function destacarMarker(marker) {
   marker.setZIndexOffset(1000); // traz pra frente
 
   marcadorSelecionado = marker;
+}
+
+function abrirPainelInfo(nome, tipo, descricao) {
+
+  document.getElementById("tituloInfo").innerText = nome;
+  document.getElementById("tipoInfo").innerText = "Tipo: " + tipo;
+  document.getElementById("descricaoInfo").innerText = descricao;
+
+  document.getElementById("painelInfo").style.right = "0";
 }
 
  </script>
