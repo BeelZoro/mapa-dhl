@@ -135,20 +135,22 @@ margin-top: 60px;
   
 #painelInfo {
   position: fixed;
-  right: -300px;
-  top: 60px;
 
-  width: 280px;
-  height: 100%;
+  left: -320px; /* começa escondido */
+  top: 80px;
+
+  width: 300px;
 
   background: white;
   padding: 15px;
 
-  z-index: 9999;
-  transition: right 0.3s ease;
+  border-radius: 0 10px 10px 0;
+  box-shadow: 4px 0 12px rgba(0,0,0,0.2);
 
-  box-shadow: -2px 0 10px rgba(0,0,0,0.2);
+  z-index: 5000;
+  transition: all 0.3s ease;
 }
+
 
 #listaSugestoes div:hover {
   background: #f5f5f5;
@@ -378,7 +380,7 @@ const marker = L.marker([lat, lng], { icon: icone })
 
     titulo.innerText = nome;
 
-    painel.style.right = "10px";
+    painel.style.left = "10px";
 
   });
 
@@ -585,7 +587,7 @@ setTimeout(() => {
 
 lista.style.position = "fixed"; 
 lista.style.top = "70px";
-lista.style.right = "10px";
+lista.style.left = "10px";
 lista.style.width = "250px";
 
 lista.style.background = "#fff";
@@ -749,11 +751,11 @@ function abrirPainelInfo(nome, tipo, descricao) {
   document.getElementById("tipoInfo").innerText = "Tipo: " + tipo;
   document.getElementById("descricaoInfo").innerText = descricao;
 
-  document.getElementById("painelInfo").style.right = "0";
+  document.getElementById("painelInfo").style.left = "0";
 }
 
 document.getElementById("fecharPainel").addEventListener("click", function() {
-  document.getElementById("painelInfo").style.right = "-300px";
+  document.getElementById("painelInfo").style.left = "-320px";
 });
 
 document.addEventListener("click", function(e) {
@@ -764,7 +766,7 @@ document.addEventListener("click", function(e) {
     !painel.contains(e.target) &&
     !e.target.closest('.leaflet-marker-icon')
   ) {
-    painel.style.right = "-300px";
+    painel.style.left = "-320px";
   }
 
 });
