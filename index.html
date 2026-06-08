@@ -230,7 +230,7 @@ font-family: 'Inter', sans-serif;
 <font type:"arial">
 <p>🔵 Shoppings: <span id="qtdAzul">0</span></p>
 <p>🔴 SPG: <span id="qtdVermelho">0</span></p>
-<p>🟢 Lojas de rua: <span id="qtdVerde">0</span></p>
+<p>🟢 Lojas de rua: <span id="qtdLojasRua">0</span></p>
 <p>🟡 Honda: <span id="qtdAmarelo">0</span></p>
 <p>🟠 BYD: <span id="qtdLaranja">0</span></p>
 <p>🟣 Stellantis: <span id="qtdRoxo">0</span></p>
@@ -422,7 +422,7 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
 
       if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
       else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
-      else if (tipo === "verde escuro") { grupo = grupoVerdeEscuro; icone = iconeVerdeE; }  
+      else if (tipo === "verde escuro") { grupo = grupoVerdeEscuro; icone = iconeVerdeEscuro; }  
       else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
       else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
       else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
@@ -577,7 +577,7 @@ setTimeout(() => {
 function selecionarTodos(ativo) {
 if (ativo) {
 grupoAzul.addTo(map);
-grupoVerde.addTo(map);
+grupoLojasRua.addTo(map);
 grupoVermelho.addTo(map);
 grupoAmarelo.addTo(map);
 grupoLaranja.addTo(map);
@@ -589,7 +589,7 @@ grupoRosa.addTo(map);
 function removerTodos(ativo) {
 if (ativo) {
 map.removeLayer(grupoAzul);
-map.removeLayer(grupoVerde);
+map.removeLayer(grupoLojasRua);
 map.removeLayer(grupoVermelho);
 map.removeLayer(grupoAmarelo);
 map.removeLayer(grupoLaranja);
@@ -602,7 +602,7 @@ map.removeLayer(grupoRosa);
 function atualizarDashboard() {
 document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
 document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
-document.getElementById("qtdVerde").innerText = grupoVerde.getLayers().length;
+document.getElementById("qtdLojasRua").innerText = grupoVerde.getLayers().length;
 document.getElementById("qtdAmarelo").innerText = grupoAmarelo.getLayers().length;
 document.getElementById("qtdLaranja").innerText = grupoLaranja.getLayers().length;
 document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
