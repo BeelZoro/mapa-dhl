@@ -255,6 +255,11 @@ const map = L.map('map', {
   zoomControl: false // remove zoom padrão
 }).setView([-23.4543, -46.5337], 11);
 
+map.on("click", function() {
+
+});
+
+  
 L.control.zoom({
   position: 'bottomleft'
 }).addTo(map);
@@ -371,20 +376,26 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
 
       if (grupo) {
 
-const marker = L.marker([lat, lng], { icon: icone })
-  .addTo(grupo)
-  .on("click", function() {
 
-    const painel = document.getElementById("painelInfo");
-    const titulo = document.getElementById("tituloPainel");
+const marker = L.marker([lat, lng], {
+  icon: icone,
+  autoPan: false // 🔥 ESSENCIAL
+})
+.addTo(grupo)
+.on("click", function(e) {
 
-    titulo.innerText = nome;
+  L.DomEvent.stopPropagation(e);
 
-    painel.style.left = "10px";
+  const painel = document.getElementById("painelInfo");
+  const titulo = document.getElementById("tituloPainel");
 
-    animarMarker(this);
+  titulo.innerText = nome;
 
-  });
+  painel.style.left = "10px";
+
+  animarMarker(this);
+
+});
 
           marker.on("click", function() {
 
