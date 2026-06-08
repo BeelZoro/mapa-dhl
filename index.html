@@ -376,36 +376,29 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
 
       if (grupo) {
 
+const marker = L.marker([lat, lng], { icon: icone })
+  .addTo(grupo)
+  .on("click", function(e) {
 
-const marker = L.marker([lat, lng], {
-  icon: icone,
-  autoPan: false // 🔥 ESSENCIAL
-})
-.addTo(grupo)
-.on("click", function(e) {
+    L.DomEvent.stopPropagation(e);
 
-  L.DomEvent.stopPropagation(e);
+    const painel = document.getElementById("painelInfo");
+    const titulo = document.getElementById("tituloPainel");
 
-  const painel = document.getElementById("painelInfo");
-  const titulo = document.getElementById("tituloPainel");
+    // buscar item completo
+    const item = marcadores.find(m => m.marker === this);
 
-  titulo.innerText = nome;
+    if (item) {
+      titulo.innerText = item.nome;
 
-  painel.style.left = "10px";
+      abrirPainelInfo(item.nome, item.tipo, item.descricao);
+    }
 
-  animarMarker(this);
+    painel.style.left = "10px";
 
-});
+    animarMarker(this);
 
-          marker.on("click", function() {
-
-  const item = marcadores.find(m => m.marker === marker);
-
-  if (item) {
-    abrirPainelInfo(nome, tipo, item.descricao);
-  }
-
-});
+  });
 
 marcadores.push({
   nome: nome.toLowerCase(),
