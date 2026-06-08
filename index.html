@@ -382,6 +382,8 @@ const marker = L.marker([lat, lng], { icon: icone })
 
     painel.style.left = "10px";
 
+    animarMarker(this);
+
   });
 
           marker.on("click", function() {
@@ -770,7 +772,28 @@ document.addEventListener("click", function(e) {
   }
 
 });
+  
+//animação no PIN
+function animarMarker(marker) {
 
+  if (!marker._icon) return;
+
+  const el = marker._icon;
+
+  el.style.transition = "transform 0.2s ease";
+
+  let i = 0;
+
+  const anim = setInterval(() => {
+
+    el.style.transform = i % 2 === 0 ? "scale(1.4)" : "scale(1)";
+    i++;
+
+    if (i > 3) clearInterval(anim);
+
+  }, 120);
+
+}
  </script>
 
 </body>
