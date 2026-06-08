@@ -364,6 +364,7 @@ iconAnchor: [12,41]
 const iconeAzul = criarIcone("#2962FF");
 const iconeVermelho = criarIcone("#D50000");
 const iconeVerde = criarIcone("#00C853");
+const iconeVerdeEscuro = criarIcone("#006400");
 const iconeAmarelo = criarIcone("#FFD600");
 const iconeLaranja = criarIcone("#FF6D00");
 const iconeRoxo = criarIcone("#6A1B9A");
@@ -373,10 +374,16 @@ const iconeRosa = criarIcone("#FF1493");
 const grupoAzul = L.layerGroup().addTo(map);
 const grupoVermelho = L.layerGroup().addTo(map);
 const grupoVerde = L.layerGroup().addTo(map);
+const grupoVerdeEscuro = L.layerGroup().addTo(map);  
 const grupoAmarelo = L.layerGroup().addTo(map);
 const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 const grupoRosa = L.layerGroup().addTo(map);
+ 
+const grupoLojasRua = L.layerGroup([
+  grupoVerde,
+  grupoVerdeEscuro
+]);
 
 // ✅ FETCH CSV
 fetch('dados_mapa.xlsx?v=' + Date.now())
@@ -415,6 +422,7 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
 
       if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
       else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
+      else if (tipo === "verde escuro") { grupo = grupoVerdeEscuro; icone = iconeVerdeE; }  
       else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
       else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
       else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
@@ -534,7 +542,7 @@ alert("Erro: " + (result.message || "ver console"));
 const controleLayers = L.control.layers(null, {
 "🔵 Shoppings": grupoAzul,
 "🔴 SPG": grupoVermelho,
-"🟢 Lojas de rua": grupoVerde,
+"🟢 Lojas de rua": grupoLojasRua,
 "🟡 Honda": grupoAmarelo,
 "🟠 BYD": grupoLaranja,
 "🟣 Stellantis": grupoRoxo,
