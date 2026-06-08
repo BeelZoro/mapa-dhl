@@ -785,16 +785,16 @@ function animarMarker(marker) {
 
   const el = marker._icon;
 
-  el.style.transition = "transform 0.25s ease-out";
+  const transformOriginal = el.style.transform;
 
-  // 🔥 ESSENCIAL: fixa o ponto de origem
+  el.style.transition = "transform 0.2s ease";
   el.style.transformOrigin = "center bottom";
 
-  // anima
-  el.style.transform = "scale(1.4)";
+  // ✅ mantém posição + aplica escala
+  el.style.transform = transformOriginal + " scale(1.4)";
 
   setTimeout(() => {
-    el.style.transform = "scale(1)";
+    el.style.transform = transformOriginal;
   }, 200);
 
 }
