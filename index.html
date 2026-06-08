@@ -778,26 +778,27 @@ document.addEventListener("click", function(e) {
 });
   
 //animação no PIN
+
 function animarMarker(marker) {
 
   if (!marker._icon) return;
 
   const el = marker._icon;
 
-  el.style.transition = "transform 0.2s ease";
+  el.style.transition = "transform 0.25s ease-out";
 
-  let i = 0;
+  // 🔥 ESSENCIAL: fixa o ponto de origem
+  el.style.transformOrigin = "center bottom";
 
-  const anim = setInterval(() => {
+  // anima
+  el.style.transform = "scale(1.4)";
 
-    el.style.transform = i % 2 === 0 ? "scale(1.4)" : "scale(1)";
-    i++;
-
-    if (i > 3) clearInterval(anim);
-
-  }, 120);
+  setTimeout(() => {
+    el.style.transform = "scale(1)";
+  }, 200);
 
 }
+
  </script>
 
 </body>
