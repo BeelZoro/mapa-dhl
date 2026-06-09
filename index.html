@@ -381,7 +381,12 @@ L.control.zoom({
   position: 'bottomleft'
 }).addTo(map);
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+L.tileLayer(
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {
+    attribution: '&copy; OpenStreetMap contributors'
+  }
+).addTo(map);
 
 const geocoder = L.Control.geocoder({
   defaultMarkGeocode: false
