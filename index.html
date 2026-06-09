@@ -677,26 +677,33 @@ map.removeLayer(grupoRosa);
 
 // ✅ DASHBOARD
 function atualizarDashboard() {
-document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
-document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
-document.getElementById("qtdLojasRua").innerText = grupoVerde.getLayers().length + grupoVerdeEscuro.getLayers().length;
-document.getElementById("qtdAmarelo").innerText = grupoAmarelo.getLayers().length;
-document.getElementById("qtdLaranja").innerText = grupoLaranja.getLayers().length;
-document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
-document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
+
+  document.getElementById("qtdAzul").innerText = grupoAzul.getLayers().length;
+
+  document.getElementById("qtdVermelho").innerText = grupoVermelho.getLayers().length;
+
+  document.getElementById("qtdLojasRua").innerText =
+    grupoVerde.getLayers().length + grupoVerdeEscuro.getLayers().length;
+
+  document.getElementById("qtdAmarelo").innerText = grupoAmarelo.getLayers().length;
+  document.getElementById("qtdLaranja").innerText = grupoLaranja.getLayers().length;
+  document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
+  document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
+
+  // ✅ TOTAL AGORA ESTÁ NO LUGAR CERTO
+  const total =
+    grupoAzul.getLayers().length +
+    grupoVermelho.getLayers().length +
+    grupoVerde.getLayers().length +
+    grupoVerdeEscuro.getLayers().length +
+    grupoAmarelo.getLayers().length +
+    grupoLaranja.getLayers().length +
+    grupoRoxo.getLayers().length +
+    grupoRosa.getLayers().length;
+
+  document.getElementById("totalGeral").innerText = total;
+
 }
-
-const total =
-  grupoAzul.getLayers().length +
-  grupoVermelho.getLayers().length +
-  grupoVerde.getLayers().length +
-  grupoVerdeEscuro.getLayers().length +
-  grupoAmarelo.getLayers().length +
-  grupoLaranja.getLayers().length +
-  grupoRoxo.getLayers().length +
-  grupoRosa.getLayers().length;
-
-document.getElementById("totalGeral").innerText = total;
 
 let dashboardAberto = false;
 
