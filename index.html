@@ -411,7 +411,11 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
 
       let lat = parseFloat(linha.lat);
       let lng = parseFloat(linha.lng);
-      let tipo = (linha.tipo || "").toLowerCase();
+
+      let tipo = (linha.tipo || "")
+      .toString()
+      .toLowerCase()
+      .trim();
 
       if (!nome || isNaN(lat) || isNaN(lng)) return;
 
@@ -422,8 +426,16 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       let icone, grupo;
 
       if (tipo === "azul") { grupo = grupoAzul; icone = iconeAzul; }
-      else if (tipo === "verde") { grupo = grupoVerde; icone = iconeVerde; }
-      else if (tipo === "verde escuro") { grupo = grupoVerdeEscuro; icone = iconeVerdeEscuro; }  
+
+      else if (tipo.includes("verde")) {
+      grupo = grupoVerde;
+      // ✅ diferencia cor, mas mantém grupo
+      if (tipo.includes("escuro")) {
+      icone = iconeVerdeEscuro;
+      } else {
+      icone = iconeVerde;
+      }
+    }
       else if (tipo === "amarelo") { grupo = grupoAmarelo; icone = iconeAmarelo; }
       else if (tipo === "vermelho") { grupo = grupoVermelho; icone = iconeVermelho; }
       else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
