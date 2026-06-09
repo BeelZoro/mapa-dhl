@@ -294,7 +294,12 @@ font-family: 'Inter', sans-serif;
   <span>🟣 Stellantis</span>
   <strong id="qtdRoxo">0</strong>
 </div>
-
+  
+<div class="card">
+  <span>🟤 Dedicado</span>
+  <strong id="qtdMarrom">0</strong>
+  
+</div>
 <div class="card">
   <span>🧬 Life Science</span>
   <strong id="qtdRosa">0</strong>
@@ -443,6 +448,7 @@ const iconeAmarelo = criarIcone("#FFD600");
 const iconeLaranja = criarIcone("#FF6D00");
 const iconeRoxo = criarIcone("#6A1B9A");
 const iconeRosa = criarIcone("#FF1493");  
+const iconeMarrom = criarIcone("#D2691E");   
 
 // ✅ GRUPOS
 const grupoAzul = L.layerGroup().addTo(map);
@@ -453,7 +459,8 @@ const grupoAmarelo = L.layerGroup().addTo(map);
 const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 const grupoRosa = L.layerGroup().addTo(map);
- 
+const grupoMarrom = L.layerGroup().addTo(map);
+  
 const grupoLojasRua = L.layerGroup([
   grupoVerde,
   grupoVerdeEscuro
@@ -516,7 +523,8 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       else if (tipo === "laranja") { grupo = grupoLaranja; icone = iconeLaranja; }
       else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
       else if (tipo === "rosa") { grupo = grupoRosa; icone = iconeRosa; }
-
+      else if (tipo === "marrom") { grupo = grupoMarrom; icone = iconeMarrom; }
+      
       if (grupo) {
 
 const marker = L.marker([lat, lng], { icon: icone })
@@ -640,6 +648,7 @@ const controleLayers = L.control.layers(null, {
 "🟡 Honda": grupoAmarelo,
 "🟠 BYD": grupoLaranja,
 "🟣 Stellantis": grupoRoxo,
+"🟤 Dedicado": grupoMarrom,
 "🧬 Life Science": grupoRosa
 }, {collapsed:false}).addTo(map);
 
@@ -677,6 +686,7 @@ grupoAmarelo.addTo(map);
 grupoLaranja.addTo(map);
 grupoRoxo.addTo(map);
 grupoRosa.addTo(map);  
+grupoMarrom.addTo(map);    
 }
 }
 
@@ -689,6 +699,7 @@ map.removeLayer(grupoAmarelo);
 map.removeLayer(grupoLaranja);
 map.removeLayer(grupoRoxo);
 map.removeLayer(grupoRosa);
+map.removeLayer(grupoMarrom);  
 }
 }
 
@@ -702,6 +713,7 @@ function atualizarDashboard() {
   const qtdLaranja = grupoLaranja.getLayers().length;
   const qtdRoxo = grupoRoxo.getLayers().length;
   const qtdRosa = grupoRosa.getLayers().length;
+  const qtdRosa = grupoMarrom.getLayers().length;
 
   document.getElementById("qtdAzul").innerText = qtdAzul;
   document.getElementById("qtdVermelho").innerText = qtdVermelho;
@@ -710,6 +722,7 @@ function atualizarDashboard() {
   document.getElementById("qtdLaranja").innerText = qtdLaranja;
   document.getElementById("qtdRoxo").innerText = qtdRoxo;
   document.getElementById("qtdRosa").innerText = qtdRosa;
+  document.getElementById("qtdMarrom").innerText = qtdRosa;
 
   // ✅ TOTAL CORRETO
   const total =
@@ -719,8 +732,9 @@ function atualizarDashboard() {
     qtdAmarelo +
     qtdLaranja +
     qtdRoxo +
-    qtdRosa;
-
+    qtdRosa +
+    qtdMarrom;
+  
   document.getElementById("totalGeral").innerText = total;
 
 }
