@@ -310,7 +310,7 @@ font-family: 'Inter', sans-serif;
 </div>
 
 <div id="painelInfo">
-  <h3 id="tituloInfo"></h3>
+  <h3 id="tituloPainel"></h3>
   <p id="descricaoInfo"></p>
 </div>
 
@@ -525,7 +525,12 @@ const marker = L.marker([lat, lng], { icon: icone })
     const titulo = document.getElementById("tituloPainel");
 
     // buscar item completo
-    const item = marcadores.find(m => m.marker === this);
+  
+const item = marcadores.find(m => m.marker === this);
+
+if (item) {
+  abrirPainelInfo(item.nomeOriginal, item.descricao);
+}
 
     if (item) {
       titulo.innerText = item.nome;
@@ -915,12 +920,12 @@ function destacarMarker(marker) {
 
 function abrirPainelInfo(nome, descricao) {
 
-  document.getElementById("tituloPainel").innerText = nome;
+  document.getElementById("tituloPainel").innerText =
+    nome || "Sem nome";
 
   document.getElementById("descricaoInfo").innerText =
     descricao || "Sem descrição";
 
-  document.getElementById("painelInfo").style.left = "0";
 }
 
 document.getElementById("fecharPainel").addEventListener("click", function() {
