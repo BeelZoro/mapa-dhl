@@ -206,6 +206,35 @@ margin-top: 60px;
   border-radius: 50%;
   animation: pulseGlow 1.5s infinite;
 }
+
+.titulo-dash {
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin: 8px 0;
+  padding: 10px;
+
+  border-radius: 8px;
+  background: #f5f5f5;
+
+  font-size: 14px;
+}
+
+.card strong {
+  font-size: 18px;
+}
+
+.card.total {
+  background: linear-gradient(135deg, #ffcc00, #ff9900);
+  color: #000;
+  font-weight: bold;
+}
  
 </style>
 </head>
@@ -224,18 +253,52 @@ font-family: 'Inter', sans-serif;
 </div>
 
 <div id="dashboard">
-<h3>📊 Resumo</h3>
-  
+
+<h3 class="titulo-dash">📊 Resumo</h3>
 <hr>
-<font type:"arial">
-<p>🔵 Shoppings: <span id="qtdAzul">0</span></p>
-<p>🔴 SPG: <span id="qtdVermelho">0</span></p>
-<p>🟢 Lojas de rua: <span id="qtdLojasRua">0</span></p>
-<p>🟡 Honda: <span id="qtdAmarelo">0</span></p>
-<p>🟠 BYD: <span id="qtdLaranja">0</span></p>
-<p>🟣 Stellantis: <span id="qtdRoxo">0</span></p>
-<p>🧬 Life Science: <span id="qtdRosa">0</span></p>  
-</font>
+
+<div class="card">
+  <span>🔵 Shoppings</span>
+  <strong id="qtdAzul">0</strong>
+</div>
+
+<div class="card">
+  <span>🔴 SPG</span>
+  <strong id="qtdVermelho">0</strong>
+</div>
+
+<div class="card">
+  <span>🟢 Lojas de rua</span>
+  <strong id="qtdLojasRua">0</strong>
+</div>
+
+<div class="card">
+  <span>🟡 Honda</span>
+  <strong id="qtdAmarelo">0</strong>
+</div>
+
+<div class="card">
+  <span>🟠 BYD</span>
+  <strong id="qtdLaranja">0</strong>
+</div>
+
+<div class="card">
+  <span>🟣 Stellantis</span>
+  <strong id="qtdRoxo">0</strong>
+</div>
+
+<div class="card">
+  <span>🧬 Life Science</span>
+  <strong id="qtdRosa">0</strong>
+</div>
+
+<hr>
+
+<div class="card total">
+  <span>📦 Total</span>
+  <strong id="totalGeral">0</strong>
+</div>
+
 </div>
 
 <div id="painelInfo">
@@ -622,6 +685,18 @@ document.getElementById("qtdLaranja").innerText = grupoLaranja.getLayers().lengt
 document.getElementById("qtdRoxo").innerText = grupoRoxo.getLayers().length;
 document.getElementById("qtdRosa").innerText = grupoRosa.getLayers().length;
 }
+
+const total =
+  grupoAzul.getLayers().length +
+  grupoVermelho.getLayers().length +
+  grupoVerde.getLayers().length +
+  grupoVerdeEscuro.getLayers().length +
+  grupoAmarelo.getLayers().length +
+  grupoLaranja.getLayers().length +
+  grupoRoxo.getLayers().length +
+  grupoRosa.getLayers().length;
+
+document.getElementById("totalGeral").innerText = total;
 
 let dashboardAberto = false;
 
