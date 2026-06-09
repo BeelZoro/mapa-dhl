@@ -311,7 +311,6 @@ font-family: 'Inter', sans-serif;
 
 <div id="painelInfo">
   <h3 id="tituloInfo"></h3>
-  <p id="tipoInfo"></p>
   <p id="descricaoInfo"></p>
 </div>
 
@@ -396,7 +395,7 @@ geocoder.on('markgeocode', function(e) {
   let encontrado = null;
 
   for (let item of marcadores) {
-    if (item.nome.includes(busca)) {
+    if (item.nomeBusca.includes(busca)) {
       encontrado = item.marker;
       break;
     }
@@ -531,7 +530,7 @@ const marker = L.marker([lat, lng], { icon: icone })
     if (item) {
       titulo.innerText = item.nome;
 
-      abrirPainelInfo(item.nome, item.tipo, item.descricao);
+      abrirPainelInfo(item.nomeOriginal, item.descricao);
     }
 
     painel.style.left = "10px";
@@ -541,7 +540,8 @@ const marker = L.marker([lat, lng], { icon: icone })
   });
 
 marcadores.push({
-  nome: nome.toLowerCase(),
+  nomeBusca: nome.toLowerCase(),
+  nomeOriginal: nome,
   marker: marker,
   descricao: descricao,
   tipo: tipo
@@ -779,7 +779,7 @@ inputBusca.addEventListener("input", function() {
   if (!termo) return;
 
   const resultados = marcadores.filter(item =>
-    item.nome.includes(termo)
+    item.nomeBusca.includes(termo)
   ).slice(0, 5);
 
   resultados.forEach((item, index) => {
@@ -875,7 +875,7 @@ function selecionarItem(item) {
     if (!termo) return;
 
     const resultados = marcadores.filter(item =>
-      item.nome.includes(termo)
+      item.nomeBusca.includes(termo)
     ).slice(0, 5);
 
     resultados.forEach(item => {
@@ -913,11 +913,12 @@ function destacarMarker(marker) {
   marcadorSelecionado = marker;
 }
 
-function abrirPainelInfo(nome, tipo, descricao) {
+function abrirPainelInfo(nome, descricao) {
 
-  document.getElementById("tituloInfo").innerText = nome;
-  document.getElementById("tipoInfo").innerText = "Tipo: " + tipo;
-  document.getElementById("descricaoInfo").innerText = descricao;
+  document.getElementById("tituloPainel").innerText = nome;
+
+  document.getElementById("descricaoInfo").innerText =
+    descricao || "Sem descrição";
 
   document.getElementById("painelInfo").style.left = "0";
 }
