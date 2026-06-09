@@ -429,10 +429,11 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
 
       else if (tipo.includes("verde")) {
       grupo = grupoVerde;
-      // ✅ diferencia cor, mas mantém grupo
       if (tipo.includes("escuro")) {
+      grupo = grupoVerdeEscuro;  
       icone = iconeVerdeEscuro;
       } else {
+      grupo = grupoVerde;  
       icone = iconeVerde;
       }
     }
