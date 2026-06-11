@@ -316,6 +316,7 @@ font-family: 'Inter', sans-serif;
 
 <div id="painelInfo">
   <h3 id="tituloPainel"></h3>
+  <p id="cepInfo"></p>
   <p id="descricaoInfo"></p>
 </div>
 
@@ -484,12 +485,14 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
               .toString()
         .replace(/\n/g, ' ')
         .trim();
-    
+      
       let descricao = (linha.descricao || "Sem descrição").toString().trim()
         .toString()
         .replace(/\n/g, ' ')
         .trim();
-
+      
+      let cep = (linha.cep || "").toString().trim();
+      
       let lat = parseFloat(linha.lat);
       let lng = parseFloat(linha.lng);
 
@@ -541,13 +544,13 @@ const marker = L.marker([lat, lng], { icon: icone })
 const item = marcadores.find(m => m.marker === this);
 
 if (item) {
-  abrirPainelInfo(item.nomeOriginal, item.descricao);
+  abrirPainelInfo(item.nomeOriginal, item.descricao, item.cep);
 }
 
     if (item) {
       titulo.innerText = item.nome;
 
-      abrirPainelInfo(item.nomeOriginal, item.descricao);
+      abrirPainelInfo(item.nomeOriginal, item.descricao, item.cep);
     }
 
     painel.style.left = "10px";
@@ -561,7 +564,8 @@ marcadores.push({
   nomeOriginal: nome,
   marker: marker,
   descricao: descricao,
-  tipo: tipo
+  tipo: tipo,
+  cep: cep
 });
 
       }
@@ -936,10 +940,14 @@ function destacarMarker(marker) {
   marcadorSelecionado = marker;
 }
 
-function abrirPainelInfo(nome, descricao) {
 
-  document.getElementById("tituloPainel").innerText =
+function abrirPainelInfo(nome, descricao, cep) {
+
+  document.getElementById("tituloInfo").innerText =
     nome || "Sem nome";
+
+  document.getElementById("cepInfo").innerText =
+    cep ? "CEP: " + cep : "";
 
   document.getElementById("descricaoInfo").innerText =
     descricao || "Sem descrição";
