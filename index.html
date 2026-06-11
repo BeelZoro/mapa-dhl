@@ -943,14 +943,21 @@ function destacarMarker(marker) {
 
 function abrirPainelInfo(nome, descricao, cep) {
 
-  document.getElementById("tituloInfo").innerText =
-    nome || "Sem nome";
+  const titulo = document.getElementById("tituloInfo");
+  const descricaoEl = document.getElementById("descricaoInfo");
+  const cepEl = document.getElementById("cepInfo");
 
-  document.getElementById("cepInfo").innerText =
-    cep ? "CEP: " + cep : "";
+  if (titulo) {
+    titulo.innerText = nome || "Sem nome";
+  }
 
-  document.getElementById("descricaoInfo").innerText =
-    descricao || "Sem descrição";
+  if (cepEl) {
+    cepEl.innerText = cep ? "CEP: " + cep : "CEP não informado";
+  }
+
+  if (descricaoEl) {
+    descricaoEl.innerText = descricao || "Sem descrição";
+  }
 
 }
 
