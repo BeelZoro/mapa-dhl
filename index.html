@@ -314,7 +314,7 @@ font-family: 'Inter', sans-serif;
 </div>
 
 <div id="painelInfo">
-  <h3 id="tituloPainel"></h3>
+  <h3 id="tituloInfo"></h3>
   <p id="cepInfo"></p>
   <p id="descricaoInfo"></p>
 </div>
@@ -547,7 +547,6 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
 const marker = L.marker([lat, lng], { icon: icone })
   .addTo(grupo);
 
-// ✅ TEM QUE SER LOGO AQUI (dentro do forEach)
 marker.dados = {
   nome: nome,
   descricao: descricao,
@@ -952,14 +951,21 @@ function destacarMarker(marker) {
 
 function abrirPainelInfo(nome, descricao, cep) {
 
-  document.getElementById("tituloInfo").innerText =
-    nome || "Sem nome";
+  const titulo = document.getElementById("tituloInfo");
+  const cepEl = document.getElementById("cepInfo");
+  const descEl = document.getElementById("descricaoInfo");
 
-  document.getElementById("cepInfo").innerText =
-    cep ? "CEP: " + cep : "";
+  if (titulo) {
+    titulo.innerText = nome || "Sem nome";
+  }
 
-  document.getElementById("descricaoInfo").innerText =
-    descricao || "Sem descrição";
+  if (cepEl) {
+    cepEl.innerText = cep ? "CEP: " + cep : "";
+  }
+
+  if (descEl) {
+    descEl.innerText = descricao || "Sem descrição";
+  }
 
 }
 
