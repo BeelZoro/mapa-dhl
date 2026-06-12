@@ -563,7 +563,11 @@ marker.on("click", function(e) {
 
   if (!dados) return;
 
-  abrirPainelInfo(dados.nome, dados.descricao, dados.cep);
+  abrirPainelInfo(
+    dados.nome,
+    dados.descricao,
+    dados.cep
+  );
 
   const painel = document.getElementById("painelInfo");
   painel.style.left = "10px";
@@ -870,13 +874,6 @@ inputBusca.addEventListener("keydown", function(e) {
 
       const nome = lista.children[indiceSelecionado].innerText;
 
-      const item = marcadores.find(m =>
-        m.nome === nome.toLowerCase()
-      );
-
-      if (item) {
-        selecionarItem(item);
-      }
     }
   }
   
@@ -953,24 +950,16 @@ function destacarMarker(marker) {
   marcadorSelecionado = marker;
 }
 
-
 function abrirPainelInfo(nome, descricao, cep) {
 
-  const titulo = document.getElementById("tituloInfo");
-  const descricaoEl = document.getElementById("descricaoInfo");
-  const cepEl = document.getElementById("cepInfo");
+  document.getElementById("tituloInfo").innerText =
+    nome || "Sem nome";
 
-  if (titulo) {
-    titulo.innerText = nome || "Sem nome";
-  }
+  document.getElementById("cepInfo").innerText =
+    cep ? "CEP: " + cep : "";
 
-  if (cepEl) {
-    cepEl.innerText = cep ? "CEP: " + cep : "CEP não informado";
-  }
-
-  if (descricaoEl) {
-    descricaoEl.innerText = descricao || "Sem descrição";
-  }
+  document.getElementById("descricaoInfo").innerText =
+    descricao || "Sem descrição";
 
 }
 
