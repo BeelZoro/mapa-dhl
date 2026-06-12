@@ -546,6 +546,13 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
 
 const marker = L.marker([lat, lng], { icon: icone })
   .addTo(grupo)
+      
+      marker.dados = {
+      nome: nome,
+      descricao: descricao,
+      cep: cep
+      };
+  
   .on("click", function(e) {
 
     L.DomEvent.stopPropagation(e);
