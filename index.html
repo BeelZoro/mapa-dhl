@@ -544,18 +544,28 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       
       if (grupo) {
 
+const marker = L.marker([lat, lng], { icon: icone })
+  .addTo(grupo);
+
+// ✅ TEM QUE SER LOGO AQUI (dentro do forEach)
+marker.dados = {
+  nome: nome,
+  descricao: descricao,
+  cep: cep
+};
+
+// ✅ evento separado corretamente
 marker.on("click", function(e) {
 
   L.DomEvent.stopPropagation(e);
 
-  const painel = document.getElementById("painelInfo");
-
   const dados = this.dados;
 
-  if (!dados) return; // ✅ segurança (opcional, mas bom)
+  if (!dados) return;
 
   abrirPainelInfo(dados.nome, dados.descricao, dados.cep);
 
+  const painel = document.getElementById("painelInfo");
   painel.style.left = "10px";
 
   animarMarker(this);
