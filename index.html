@@ -340,7 +340,12 @@ font-family: 'Inter', sans-serif;
   <span>🧬 Life Science</span>
   <strong id="qtdRosa">0</strong>
 </div>
-
+  
+<div class="card">
+  <span>⛓️ Malha</span>
+  <strong id="qtdAquamarine">0</strong>
+</div>
+  
 <hr>
 
 <div class="card total">
@@ -486,6 +491,7 @@ const iconeLaranja = criarIcone("#FF6D00");
 const iconeRoxo = criarIcone("#6A1B9A");
 const iconeRosa = criarIcone("#FF1493");  
 const iconeMarrom = criarIcone("#D2691E");   
+const iconeAquamarine = criarIcone("#7FFFD4");  
 
 // ✅ GRUPOS
 const grupoAzul = L.layerGroup().addTo(map);
@@ -497,7 +503,7 @@ const grupoLaranja = L.layerGroup().addTo(map);
 const grupoRoxo = L.layerGroup().addTo(map);
 const grupoRosa = L.layerGroup().addTo(map);
 const grupoMarrom = L.layerGroup().addTo(map);
-  
+const grupoAquamarine = L.layerGroup().addTo(map);  
 const grupoLojasRua = L.layerGroup([
   grupoVerde,
   grupoVerdeEscuro
@@ -577,7 +583,7 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
       else if (tipo === "roxo") { grupo = grupoRoxo; icone = iconeRoxo; }
       else if (tipo === "rosa") { grupo = grupoRosa; icone = iconeRosa; }
       else if (tipo === "marrom") { grupo = grupoMarrom; icone = iconeMarrom; }
-      
+      else if (tipo === "aquamarine") { grupo = grupoAquamarine; icone = iconeAquamarine; }
       if (grupo) {
 
 const marker = L.marker([lat, lng], { icon: icone })
@@ -705,7 +711,8 @@ const controleLayers = L.control.layers(null, {
 "🟠 BYD": grupoLaranja,
 "🟣 Stellantis": grupoRoxo,
 "🟤 Dedicado": grupoMarrom,
-"🧬 Life Science": grupoRosa
+"🧬 Life Science": grupoRosa,
+"⛓️ Malha": grupoRosa  
 }, {collapsed:false}).addTo(map);
 
 setTimeout(() => {
@@ -742,7 +749,8 @@ grupoAmarelo.addTo(map);
 grupoLaranja.addTo(map);
 grupoRoxo.addTo(map);
 grupoRosa.addTo(map);  
-grupoMarrom.addTo(map);    
+grupoMarrom.addTo(map);
+grupoAquamarine.addTo(map);   
 }
 }
 
@@ -756,6 +764,7 @@ map.removeLayer(grupoLaranja);
 map.removeLayer(grupoRoxo);
 map.removeLayer(grupoRosa);
 map.removeLayer(grupoMarrom);  
+map.removeLayer(grupoAquamarine);  
 }
 }
 
@@ -770,7 +779,8 @@ function atualizarDashboard() {
   const qtdRoxo = grupoRoxo.getLayers().length;
   const qtdRosa = grupoRosa.getLayers().length;
   const qtdMarrom = grupoMarrom.getLayers().length;
-
+  const qtdAquamarine = grupoAquamarine.getLayers().length;
+  
   document.getElementById("qtdAzul").innerText = qtdAzul;
   document.getElementById("qtdVermelho").innerText = qtdVermelho;
   document.getElementById("qtdLojasRua").innerText = qtdLojasRua;
@@ -779,6 +789,7 @@ function atualizarDashboard() {
   document.getElementById("qtdRoxo").innerText = qtdRoxo;
   document.getElementById("qtdRosa").innerText = qtdRosa;
   document.getElementById("qtdMarrom").innerText = qtdMarrom;
+  document.getElementById("qtdAquamarine").innerText = qtdAquamarine;
 
   // ✅ TOTAL CORRETO
   const total =
@@ -789,7 +800,8 @@ function atualizarDashboard() {
     qtdLaranja +
     qtdRoxo +
     qtdRosa +
-    qtdMarrom;
+    qtdMarrom +
+    qtdAquamarine;
   
   document.getElementById("totalGeral").innerText = total;
 
@@ -818,7 +830,7 @@ function toggleTodosMapa(ativo) {
 
   layersControl.forEach(input => {
     if (input.checked !== ativo) {
-      input.click(); // 🔥 sincroniza com Leaflet
+      input.click(); // sincroniza com Leaflet
     }
   });
 
