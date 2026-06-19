@@ -435,33 +435,42 @@ L.tileLayer(
   }
 ).addTo(map);
 
-const geocoder = L.Control.geocoder({
-  defaultMarkGeocode: false
-}).addTo(map);
-
 geocoder.on('markgeocode', function(e) {
 
-  const input = document.querySelector('.leaflet-control-geocoder input');
-  const busca = input.value.toLowerCase().trim();
+  const busca = e.geocode.name.toLowerCase();
 
   let encontrado = null;
 
   for (let item of marcadores) {
     if (item.nomeBusca.includes(busca)) {
-      encontrado = item.marker;
+      encontrado = item;
       break;
     }
   }
 
   if (encontrado) {
-    map.setView(encontrado.getLatLng(), 16);
-    encontrado.openPopup();
 
-    destacarMarker(encontrado);
-    
+    const latlng = encontrado.marker.getLatLng();
+
+    map.setView(latlng, 16);
+
+    // ✅ ABRE O PAINEL (ESSENCIAL)
+    abrirPainelInfo(
+      encontrado.nomeOriginal,
+      encontrado.descricao,
+      encontrado.cep
+    );
+
+    abrirPainel();
+
+    animarMarker(encontrado.marker);
+
   } else {
+
+    // fallback → comportamento original do geocoder
     const bbox = e.geocode.bbox;
     map.fitBounds(bbox);
+
   }
 
 });
@@ -879,7 +888,7 @@ inputBusca.addEventListener("input", function() {
 
     div.style.padding = "6px";
     div.style.cursor = "pointer";
-    div.innerText = item.nome;
+    div.innerText = item.nomeOriginal;
 
     // ✅ HOVER (visual)
     div.addEventListener("mouseover", () => {
@@ -968,7 +977,7 @@ function selecionarItem(item) {
 
       div.style.padding = "6px";
       div.style.cursor = "pointer";
-      div.innerText = item.nome;
+      div.innerText = item.nomeOriginal;
 
       div.onclick = function() {
         map.setView(item.marker.getLatLng(), 16);
