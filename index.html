@@ -442,11 +442,15 @@ const geocoder = L.Control.geocoder({
 geocoder.on('markgeocode', function(e) {
 
   const busca = e.geocode.name.toLowerCase();
-
+  const termo = busca.split(",")[0].trim();
   let encontrado = null;
 
   for (let item of marcadores) {
-    if (item.nomeBusca.includes(busca)) {
+    if (
+      item.nomeBusca.includes(termo) ||
+      termo.includes(item.nomeBusca)
+      ) {
+
       encontrado = item;
       break;
     }
