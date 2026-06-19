@@ -435,6 +435,10 @@ L.tileLayer(
   }
 ).addTo(map);
 
+const geocoder = L.Control.geocoder({
+  defaultMarkGeocode: false
+}).addTo(map);
+  
 geocoder.on('markgeocode', function(e) {
 
   const busca = e.geocode.name.toLowerCase();
@@ -454,7 +458,7 @@ geocoder.on('markgeocode', function(e) {
 
     map.setView(latlng, 16);
 
-    // ✅ ABRE O PAINEL (ESSENCIAL)
+    // ✅ ABRE O PAINEL
     abrirPainelInfo(
       encontrado.nomeOriginal,
       encontrado.descricao,
@@ -467,9 +471,7 @@ geocoder.on('markgeocode', function(e) {
 
   } else {
 
-    // fallback → comportamento original do geocoder
-    const bbox = e.geocode.bbox;
-    map.fitBounds(bbox);
+    map.fitBounds(e.geocode.bbox);
 
   }
 
@@ -846,24 +848,6 @@ function toggleTodosMapa(ativo) {
 }
   
 setTimeout(() => {
-
-  const inputBusca = document.querySelector('.leaflet-control-geocoder input');
-
-  if (!inputBusca) return;
-
-  const lista = document.createElement("div");
-
-lista.style.position = "fixed"; 
-lista.style.top = "70px";
-lista.style.left = "10px";
-lista.style.width = "250px";
-
-lista.style.background = "#fff";
-lista.style.border = "1px solid #ccc";
-lista.style.zIndex = "999999999";
-lista.style.maxHeight = "200px";
-lista.style.overflowY = "auto";
-lista.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
 
 document.body.appendChild(lista);
   
