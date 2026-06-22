@@ -406,6 +406,22 @@ z-index: 2000;
   box-shadow: none !important;
 } */
 
+#painelFiltrosWrapper {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+
+  width: 260px;
+
+  background: rgba(255,0,0,0.2); /* 🔥 DEBUG VISUAL */
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  z-index: 999999 !important;
+}
+
 </style>
 </head>
 
@@ -504,9 +520,11 @@ font-family: 'Inter', sans-serif;
 
 <div id="painelFiltrosWrapper">
 
-  <div id="filtroRotas"></div>
+  <div id="filtroRotas">Carregando rotas...</div>
 
-  <div id="camadasWrapper" style="display: none;"></div>
+  <div id="camadasWrapper" style="display:none;">
+    <div style="color:#333;">Carregando filtros...</div>
+  </div>
 
   <button id="btnCamadas">🎯 Filtros</button>
 
