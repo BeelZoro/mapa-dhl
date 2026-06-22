@@ -320,10 +320,13 @@ z-index: 2000;
 
 <div id="painelFiltrosWrapper">
 
+  <!-- ROTAS -->
   <div id="filtroRotas"></div>
 
-  <div id="camadasWrapper" style="display: none;"></div>
+  <!-- CAMADAS (Leaflet vai entrar aqui) -->
+  <div id="camadasWrapper" style="display:none;"></div>
 
+  <!-- BOTÃO -->
   <button id="btnCamadas">🎯 Filtros</button>
 
 </div>
@@ -341,12 +344,58 @@ z-index: 2000;
 } */
 
 /* Tipos (Leaflet) */
+
+#painelFiltrosWrapper {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  width: 260px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  z-index: 3000;
+}
+
+/* ROTAS */
+#filtroRotas {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+
+  max-height: 200px;
+  overflow-y: auto;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* CAMADAS */
 #camadasWrapper {
   background: white;
   padding: 10px;
   border-radius: 10px;
 
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* RESET HARD DO LEAFLET */
+.leaflet-control-layers {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+/* BOTÃO */
+#btnCamadas {
+  background: #ffcc00;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 /* Remove estilo fixo original
@@ -716,16 +765,43 @@ marker.on("click", function(e) {
   const painel = document.getElementById("painelInfo");
   painel.style.left = "10px";
 
+
 setTimeout(() => {
+
   const camadas = document.querySelector(".leaflet-control-layers");
   const wrapper = document.getElementById("camadasWrapper");
 
   if (camadas && wrapper) {
+
     wrapper.appendChild(camadas);
 
-    camadas.style.display = "block";
+    // ADICIONA "Selecionar todos" corretamente
+    const lista = camadas.querySelector(".leaflet-control-layers-list");
+
+    if (lista && !document.getElementById("checkTodosMapa")) {
+
+      const div = document.createElement("div");
+
+      div.innerHTML = `
+        <label style="font-weight:bold;">
+          <input type="checkbox" id="checkTodosMapa">
+          ✅ Selecionar Todos
+        </label>
+        <hr style="margin:5px 0;">
+      `;
+
+      lista.insertBefore(div, lista.firstChild);
+
+      document.getElementById("checkTodosMapa").addEventListener("change", function(e) {
+        toggleTodosMapa(e.target.checked);
+      });
+
+    }
+
   }
-}, 300);
+
+}, 600);
+
 
   animarMarker(this);
 
