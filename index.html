@@ -183,10 +183,6 @@ z-index: 2000;
 .leaflet-control-layers {
   font-family: 'Inter', sans-serif !important;
 }
-
-.leaflet-control-layers {
-  display: none;
-}
  
 /* efeito pulse contínuo */
 @keyframes pulseMarker {
@@ -322,6 +318,49 @@ z-index: 2000;
   z-index: 3000;
 }
 
+#painelFiltrosWrapper {
+  position: absolute;
+  top: 80px; /* abaixo da barra */
+  right: 20px;
+
+  width: 260px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  z-index: 3000;
+}
+
+/* Rotas */
+/* #filtroRotas {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+
+  max-height: 200px;
+  overflow-y: auto;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+} */
+
+/* Tipos (Leaflet) */
+#camadasWrapper {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* Remove estilo fixo original
+.leaflet-control-layers {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  box-shadow: none !important;
+} */
+
 </style>
 </head>
 
@@ -420,6 +459,14 @@ font-family: 'Inter', sans-serif;
   🎯 Filtros
 </button>
 
+</div>
+
+<div id="painelFiltrosWrapper">
+  <div id="filtroRotas"></div>
+
+  <div id="camadasWrapper"></div>
+
+  <button id="btnCamadas">🎯 Filtros</button>
 </div>
 
 <div id="painelInfo" style="
@@ -674,6 +721,17 @@ marker.on("click", function(e) {
 
   const painel = document.getElementById("painelInfo");
   painel.style.left = "10px";
+
+setTimeout(() => {
+  const camadas = document.querySelector(".leaflet-control-layers");
+  const wrapper = document.getElementById("camadasWrapper");
+
+  if (camadas && wrapper) {
+    wrapper.appendChild(camadas);
+
+    camadas.style.display = "block";
+  }
+}, 300);
 
   animarMarker(this);
 
@@ -1036,6 +1094,15 @@ function toggleCamadas() {
 
 window.onload = function() {
   document.getElementById("btnCamadas").onclick = toggleCamadas;
+};
+
+document.getElementById("btnCamadas").onclick = function() {
+
+  const painel = document.getElementById("camadasWrapper");
+
+  painel.style.display =
+    painel.style.display === "none" ? "block" : "none";
+
 };
 
  </script>
