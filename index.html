@@ -280,6 +280,29 @@ z-index: 2000;
   line-height: 1.4;
 }
 
+.painel-rotas {
+  position: absolute;
+  top: 150px; /* ajusta conforme seu layout */
+  right: 20px;
+
+  background: white;
+  padding: 10px;
+
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
+  max-height: 250px;
+  overflow-y: auto;
+
+  z-index: 2000;
+}
+
+.painel-rotas label {
+  display: block;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
 </style>
 </head>
 
@@ -406,7 +429,8 @@ font-family: 'Inter', sans-serif;
   <h3 id="tituloPainel">Nome</h3>
 
 </div>
-
+<div id="filtroRotas" class="painel-rotas"></div>
+  
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
@@ -537,7 +561,7 @@ fetch('dados_mapa.xlsx?v=' + Date.now())
     const unicos = new Set();
 
     json.forEach(linha => {
-
+    let rota = (linha.rota || "").toString().trim();
     let nome = (
       linha.nome ||
       linha.Nome ||
@@ -638,13 +662,16 @@ marcadores.push({
   marker: marker,
   descricao: descricao,
   tipo: tipo,
-  cep: cep
+  cep: cep,
+  rota: rota
 });
 
       }
 
     });
-
+const rotasUnicas = [...new Set(marcadores.map(m => m.rota))];
+    criarFiltroRotas(rotasUnicas);
+    
     // ✅ IMPORTANTE: fora do forEach
     atualizarDashboard();
 
@@ -916,6 +943,60 @@ function animarMarker(marker) {
   marker._icon.classList.add("pulse-marker");
 
   markerAtivo = marker;
+}
+
+function criarFiltroRotas(rotasUnicas) {
+
+  const container = document.getElementById("filtroRotas");
+
+  container.innerHTML = ""; // limpa antes
+
+  rotasUnicas.forEach(rota => {
+
+    if (!rota) return; // ignora vazio
+
+    const label = document.createElement("label");
+
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.checked = true;
+
+    input.onchange = () => filtrarPorRota();
+
+    label.appendChild(input);
+    label.append(" " + rota);
+
+    container.appendChild(label);
+
+  });
+
+}
+
+function filtrarPorRota() {
+
+  const labels = document.querySelectorAll("#filtroRotas label");
+
+  labels.forEach(label => {
+
+    const input = label.querySelector("input");
+    const rota = label.textContent.trim();
+
+    marcadores.forEach(item => {
+
+      if (item.rota === rota) {
+
+        if (input.checked) {
+          map.addLayer(item.marker);
+        } else {
+          map.removeLayer(item.marker);
+        }
+
+      }
+
+    });
+
+  });
+
 }
 
  </script>
