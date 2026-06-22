@@ -783,7 +783,12 @@ marker.on("click", function(e) {
   const painel = document.getElementById("painelInfo");
   painel.style.left = "10px";
 
+const rotasUnicas = [...new Set(marcadores.map(m => m.rota))]; //teste teste teste//
 
+console.log("ROTAS GERADAS:", rotasUnicas);
+
+criarFiltroRotas(rotasUnicas);
+  
 setTimeout(() => {
 
   const camadas = document.querySelector(".leaflet-control-layers");
@@ -819,7 +824,6 @@ setTimeout(() => {
   }
 
 }, 600);
-
 
   animarMarker(this);
 
