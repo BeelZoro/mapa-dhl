@@ -184,6 +184,10 @@ z-index: 2000;
   font-family: 'Inter', sans-serif !important;
 }
 
+.leaflet-control-layers {
+  display: none;
+}
+ 
 /* efeito pulse contínuo */
 @keyframes pulseMarker {
   0% {
@@ -303,6 +307,21 @@ z-index: 2000;
   cursor: pointer;
 }
 
+.botao-camadas {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+
+  background: #ffcc00;
+  border: none;
+  padding: 10px;
+
+  border-radius: 8px;
+  cursor: pointer;
+
+  z-index: 3000;
+}
+
 </style>
 </head>
 
@@ -396,6 +415,10 @@ font-family: 'Inter', sans-serif;
   <button class="botao botao-secundario" onclick="location.reload()">
     🔄 Recarregar
   </button>
+
+<button id="btnCamadas" class="botao-camadas">
+  🎯 Filtros
+</button>
 
 </div>
 
@@ -998,6 +1021,22 @@ function filtrarPorRota() {
   });
 
 }
+
+function toggleCamadas() {
+  const painel = document.querySelector(".leaflet-control-layers");
+
+  if (!painel) return;
+
+  if (painel.style.display === "none") {
+    painel.style.display = "block";
+  } else {
+    painel.style.display = "none";
+  }
+}
+
+window.onload = function() {
+  document.getElementById("btnCamadas").onclick = toggleCamadas;
+};
 
  </script>
 
