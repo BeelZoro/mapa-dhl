@@ -412,6 +412,11 @@ z-index: 2000;
   width: 100%;
 }
 
+#filtroRotas,
+#camadasWrapper,
+.leaflet-control-layers {
+  font-family: 'Inter', sans-serif;
+}
 
 </style>
 </head>
@@ -796,6 +801,7 @@ marker.on("click", function(e) {
   painel.style.left = "10px";
   
 
+
 setTimeout(() => {
 
   const camadas = document.querySelector(".leaflet-control-layers");
@@ -813,8 +819,8 @@ setTimeout(() => {
 
       div.innerHTML = `
         <label style="font-weight:bold;">
-          <input type="checkbox" id="checkTodosMapa">
-          ✅ Selecionar Todos
+          <input type="checkbox" id="checkTodosMapa" checked>
+          ✅ Selecionar todos
         </label>
         <hr style="margin:5px 0;">
       `;
@@ -1109,15 +1115,45 @@ function animarMarker(marker) {
   markerAtivo = marker;
 }
 
+
 function criarFiltroRotas(rotasUnicas) {
 
   const container = document.getElementById("filtroRotas");
+  container.innerHTML = "";
 
-  container.innerHTML = ""; // limpa antes
+  if (rotasUnicas.length === 0) {
+    container.innerHTML = "<span style='font-size:11px;color:#888;'>Sem rotas</span>";
+    return;
+  }
 
+  // ✅ CHECKBOX "SELECIONAR TODOS"
+  const selectAll = document.createElement("label");
+  selectAll.style.fontWeight = "bold";
+
+  const inputAll = document.createElement("input");
+  inputAll.type = "checkbox";
+  inputAll.checked = true;
+
+  inputAll.onchange = function () {
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+
+    checkboxes.forEach(cb => {
+      cb.checked = this.checked;
+    });
+
+    filtrarPorRota();
+  };
+
+  selectAll.appendChild(inputAll);
+  selectAll.append(" ✅ Selecionar todos");
+
+  container.appendChild(selectAll);
+  container.appendChild(document.createElement("hr"));
+
+  // ✅ ROTAS
   rotasUnicas.forEach(rota => {
 
-    if (!rota) return; // ignora vazio
+    if (!rota) return;
 
     const label = document.createElement("label");
 
