@@ -340,13 +340,15 @@ z-index: 2000;
 
 #painelFiltrosWrapper {
   position: fixed;
-  top: 80px;
+  top: 120px; /* 🔥 abaixo da busca */
   right: 20px;
-  width: 260px;
+
+  width: 200px; /* menor */
+  font-size: 13px;
 
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 
   z-index: 4000;
 }
@@ -354,20 +356,39 @@ z-index: 2000;
 /* ROTAS */
 #filtroRotas {
   background: white;
-  padding: 10px;
-  border-radius: 10px;
-  max-height: 200px;
+  padding: 8px;
+  border-radius: 8px;
+  max-height: 140px;
   overflow-y: auto;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+#filtroRotas label {
+  display: block;
+  margin-bottom: 3px;
+  cursor: pointer;
+  font-size: 12px;
 }
 
 /* CAMADAS (LOJAS) */
 #camadasWrapper {
-  display: none; /* COMEÇA ESCONDIDO */
+  display: none;
+
   background: white;
-  padding: 10px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  padding: 8px;
+  border-radius: 8px;
+
+  max-height: 160px;
+  overflow-y: auto;
+
+  font-size: 12px;
+
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.leaflet-control-layers-list label {
+  font-size: 12px;
+  margin-bottom: 3px;
 }
 
 /* RESET LEAFLET */
@@ -381,10 +402,16 @@ z-index: 2000;
 #btnCamadas {
   background: #ffcc00;
   border: none;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 8px;
+
+  font-size: 13px;
+
+  border-radius: 6px;
   cursor: pointer;
+
+  width: 100%;
 }
+
 
 </style>
 </head>
@@ -503,7 +530,7 @@ font-family: 'Inter', sans-serif;
 
 <div id="painelFiltrosWrapper">
 
-  <div id="filtroRotas">Carregando rotas...</div>
+  <div id="filtroRotas"></div>
 
   <div id="camadasWrapper" style="display:none;">
     <div style="color:#333;">Carregando filtros...</div>
