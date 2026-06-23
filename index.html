@@ -946,10 +946,35 @@ setTimeout(() => {
   const wrapper = document.getElementById("camadasWrapper");
 
   if (camadas && wrapper) {
+
     wrapper.appendChild(camadas);
+
+    const lista = camadas.querySelector(".leaflet-control-layers-list");
+
+    if (lista && !document.getElementById("checkTodosMapa")) {
+
+      const div = document.createElement("div");
+
+      div.innerHTML = `
+        <label style="font-weight:bold;">
+          <input type="checkbox" id="checkTodosMapa" checked>
+          ✅ Selecionar todos
+        </label>
+        <hr style="margin:5px 0;">
+      `;
+
+      lista.insertBefore(div, lista.firstChild);
+
+      document.getElementById("checkTodosMapa")
+        .addEventListener("change", function(e) {
+          toggleTodosMapa(e.target.checked);
+        });
+
+    }
+
   }
 
-}, 500);
+}, 600);
 
 // ✅ CHECKBOX
 function selecionarTodos(ativo) {
@@ -1036,14 +1061,16 @@ function toggleDashboard() {
 
 function toggleTodosMapa(ativo) {
 
-  const layersControl = document.querySelectorAll(
+  const inputs = document.querySelectorAll(
     '.leaflet-control-layers-overlays input[type="checkbox"]'
   );
 
-  layersControl.forEach(input => {
+  inputs.forEach(input => {
+
     if (input.checked !== ativo) {
-      input.click(); // sincroniza com Leaflet
+      input.click(); // mantém o Leaflet sincronizado
     }
+
   });
 
 }
