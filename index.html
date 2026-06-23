@@ -318,19 +318,6 @@ z-index: 2000;
   z-index: 3000;
 }
 
-<div id="painelFiltrosWrapper">
-
-  <!-- ROTAS -->
-  <div id="filtroRotas"></div>
-
-  <!-- CAMADAS (Leaflet vai entrar aqui) -->
-  <div id="camadasWrapper" style="display:none;"></div>
-
-  <!-- BOTÃO -->
-  <button id="btnCamadas">🎯 Filtros</button>
-
-</div>
-
 /* Rotas */
 /* #filtroRotas {
   background: white;
@@ -342,61 +329,6 @@ z-index: 2000;
 
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 } */
-
-/* Tipos (Leaflet) */
-
-#painelFiltrosWrapper {
-  position: absolute;
-  top: 70px;
-  right: 20px;
-  width: 260px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  z-index: 3000;
-}
-
-/* ROTAS */
-#filtroRotas {
-  background: white;
-  padding: 10px;
-  border-radius: 10px;
-
-  max-height: 200px;
-  overflow-y: auto;
-
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-/* CAMADAS */
-#camadasWrapper {
-  background: white;
-  padding: 10px;
-  border-radius: 10px;
-
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-/* RESET HARD DO LEAFLET */
-.leaflet-control-layers {
-  position: relative !important;
-  top: auto !important;
-  right: auto !important;
-  left: auto !important;
-  margin: 0 !important;
-  box-shadow: none !important;
-}
-
-/* BOTÃO */
-#btnCamadas {
-  background: #ffcc00;
-  border: none;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-}
 
 /* Remove estilo fixo original
 .leaflet-control-layers {
@@ -410,16 +342,48 @@ z-index: 2000;
   position: fixed;
   top: 80px;
   right: 20px;
-
   width: 260px;
-
-  background: rgba(255,0,0,0.2); /* 🔥 DEBUG VISUAL */
 
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 
-  z-index: 999999 !important;
+  z-index: 4000;
+}
+
+/* ROTAS */
+#filtroRotas {
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* CAMADAS (LOJAS) */
+#camadasWrapper {
+  display: none; /* COMEÇA ESCONDIDO */
+  background: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* RESET LEAFLET */
+.leaflet-control-layers {
+  position: relative !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+/* BOTÃO */
+#btnCamadas {
+  background: #ffcc00;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 </style>
@@ -503,6 +467,25 @@ font-family: 'Inter', sans-serif;
   <p id="descricaoInfo"></p>
 </div>
 
+<div id="painelInfo">
+
+  <button id="fecharPainel" style="
+    float: right;
+    border: none;
+    background: none;
+    font-size: 18px;
+    cursor: pointer;
+  ">
+    ❌
+  </button>
+
+  <h3 id="tituloInfo"></h3>
+  <p id="cepInfo"></p>
+  <p id="descricaoInfo"></p>
+
+</div>
+
+  
 <div id="map"></div>
 
 <div class="painel-upload">
@@ -560,7 +543,6 @@ font-family: 'Inter', sans-serif;
   <h3 id="tituloPainel">Nome</h3>
 
 </div>
-<div id="filtroRotas" class="painel-rotas"></div>
   
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
@@ -765,6 +747,9 @@ marker.dados = {
   cep: cep
 };
 
+const rotasUnicas = [...new Set(marcadores.map(m => m.rota))];
+criarFiltroRotas(rotasUnicas);
+
 // ✅ evento separado corretamente
 marker.on("click", function(e) {
 
@@ -782,13 +767,8 @@ marker.on("click", function(e) {
 
   const painel = document.getElementById("painelInfo");
   painel.style.left = "10px";
-
-const rotasUnicas = [...new Set(marcadores.map(m => m.rota))]; //teste teste teste//
-
-console.log("ROTAS GERADAS:", rotasUnicas);
-
-criarFiltroRotas(rotasUnicas);
   
+
 setTimeout(() => {
 
   const camadas = document.querySelector(".leaflet-control-layers");
@@ -798,7 +778,6 @@ setTimeout(() => {
 
     wrapper.appendChild(camadas);
 
-    // ADICIONA "Selecionar todos" corretamente
     const lista = camadas.querySelector(".leaflet-control-layers-list");
 
     if (lista && !document.getElementById("checkTodosMapa")) {
@@ -1179,8 +1158,11 @@ document.getElementById("btnCamadas").onclick = function() {
 
   const painel = document.getElementById("camadasWrapper");
 
-  painel.style.display =
-    painel.style.display === "none" ? "block" : "none";
+  if (painel.style.display === "none" || painel.style.display === "") {
+    painel.style.display = "block";
+  } else {
+    painel.style.display = "none";
+  }
 
 };
 
